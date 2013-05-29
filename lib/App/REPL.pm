@@ -87,8 +87,8 @@ sub run {
 sub _read {
     my $self = shift;
 
-    $self->_wrapped_plugin('display_prompt');
-    my ($line) = $self->_wrapped_plugin('read_line');
+    my $prompt = $self->_wrapped_plugin('prompt');
+    my ($line) = $self->_wrapped_plugin('read_line', $prompt);
 
     return $line;
 }

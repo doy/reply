@@ -15,15 +15,13 @@ use base 'App::REPL::Plugin';
 
 use Eval::Closure;
 
-sub display_prompt {
-    my $self = shift;
-
-    print "> ";
-}
+sub prompt { "> " }
 
 sub read_line {
     my $self = shift;
+    my ($next, $prompt) = @_;
 
+    print $prompt;
     return scalar <>;
 }
 
