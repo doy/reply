@@ -4,4 +4,4 @@ use warnings;
 
 use App::REPL;
 
-App::REPL->new->run;
+App::REPL->new(script => "$ENV{HOME}/.replrc")->run;

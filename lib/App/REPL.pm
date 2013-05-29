@@ -2,19 +2,47 @@ package App::REPL;
 use strict;
 use warnings;
 
-use App::REPL::Plugin::Defaults;
-
 use Module::Runtime qw(compose_module_name use_package_optimistically);
 use Scalar::Util qw(blessed);
 use Try::Tiny;
 
 sub new {
-    bless {
-        plugins => [],
-        _default_plugins => [
-            App::REPL::Plugin::Defaults->new,
-        ],
-    }, shift;
+    my $class = shift;
+    my %opts = @_;
+
+    require App::REPL::Plugin::Defaults;
+    my $self = bless {
+        plugins         => [],
+        _default_plugin => App::REPL::Plugin::Defaults->new,
+    }, $class;
+
+    my @plugins;
+    my $postlude;
+    if (exists $opts{script}) {
+        my $script = do {
+            open my $fh, '<', $opts{script}
+                or die "Can't open $opts{script}: $!";
+            local $/ = undef;
+            <$fh>
+        };
+        local *main::load_plugin = sub {
+            push @plugins, @_;
+        };
+        local *main::postlude = sub {
+            $postlude .= $_[0];
+        };
+        print "Loading configuration from $opts{script}... ";
+        $self->_eval($script);
+        print "done\n";
+    }
+
+    $self->load_plugin($_) for @{ $opts{plugins} || [] }, @plugins;
+
+    if (defined $postlude) {
+        $self->_eval($postlude);
+    }
+
+    return $self;
 }
 
 sub load_plugin {
@@ -37,7 +65,7 @@ sub plugins {
 
     return (
         @{ $self->{plugins} },
-        @{ $self->{_default_plugins} },
+        $self->{_default_plugin},
     );
 }
 
@@ -61,8 +89,6 @@ sub _read {
 
     $self->_wrapped_plugin('display_prompt');
     my ($line) = $self->_wrapped_plugin('read_line');
-    ($line) = $self->_chained_plugin('mangle_line', $line)
-        if defined $line;
 
     return $line;
 }
@@ -70,6 +96,9 @@ sub _read {
 sub _eval {
     my $self = shift;
     my ($line) = @_;
+
+    ($line) = $self->_chained_plugin('mangle_line', $line)
+        if defined $line;
 
     return $self->_wrapped_plugin('evaluate', $line);
 }
