@@ -45,7 +45,12 @@ sub run {
 
     while (defined(my $line = $self->_read)) {
         my @result = $self->_eval($line);
-        $self->_print(@result);
+        if ($@) {
+            $self->_print_error($@);
+        }
+        else {
+            $self->_print_result(@result);
+        }
     }
     print "\n";
 }
@@ -67,7 +72,15 @@ sub _eval {
     return $self->_wrapped_plugin('evaluate', $line);
 }
 
-sub _print {
+sub _print_error {
+    my $self = shift;
+    my ($error) = @_;
+
+    ($error) = $self->_chained_plugin('munge_error', $error);
+    $self->_wrapped_plugin('print_error', $error);
+}
+
+sub _print_result {
     my $self = shift;
     my (@result) = @_;
 

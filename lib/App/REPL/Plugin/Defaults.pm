@@ -23,6 +23,14 @@ sub evaluate {
     return eval $line;
 }
 
+sub print_error {
+    my $self = shift;
+    my ($next, $error) = @_;
+
+    print $error, "\n"
+        if defined $error;
+}
+
 sub print_result {
     my $self = shift;
     my ($next, $result) = @_;
