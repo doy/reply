@@ -61,7 +61,7 @@ sub _read {
 
     $self->_wrapped_plugin('display_prompt');
     my ($line) = $self->_wrapped_plugin('read_line');
-    ($line) = $self->_chained_plugin('munge_line', $line);
+    ($line) = $self->_chained_plugin('mangle_line', $line);
 
     return $line;
 }
@@ -77,7 +77,7 @@ sub _print_error {
     my $self = shift;
     my ($error) = @_;
 
-    ($error) = $self->_chained_plugin('munge_error', $error);
+    ($error) = $self->_chained_plugin('mangle_error', $error);
     $self->_wrapped_plugin('print_error', $error);
 }
 
@@ -85,7 +85,7 @@ sub _print_result {
     my $self = shift;
     my (@result) = @_;
 
-    @result = $self->_chained_plugin('munge_result', @result);
+    @result = $self->_chained_plugin('mangle_result', @result);
     $self->_wrapped_plugin('print_result', @result);
 }
 
