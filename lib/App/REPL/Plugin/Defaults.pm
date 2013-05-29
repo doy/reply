@@ -1,4 +1,8 @@
 package App::REPL::Plugin::Defaults;
+
+# don't pollute with strict and warnings for this module
+sub _eval { eval($_[0]) }
+
 use strict;
 use warnings;
 
@@ -20,7 +24,7 @@ sub evaluate {
     my $self = shift;
     my ($next, $line) = @_;
 
-    return eval $line;
+    return _eval($line);
 }
 
 sub print_error {
