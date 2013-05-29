@@ -34,10 +34,10 @@ sub evaluate {
     my ($next, $line, %args) = @_;
 
     return eval_closure(
-        source      => "$PREFIX; $line",
+        source      => "sub { $PREFIX; $line }",
         terse_error => 1,
         %args,
-    );
+    )->();
 }
 
 sub print_error {
