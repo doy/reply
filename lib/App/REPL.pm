@@ -1,6 +1,7 @@
 package App::REPL;
 use strict;
 use warnings;
+# ABSTRACT: simple, pluggable repl
 
 use Module::Runtime qw(compose_module_name use_package_optimistically);
 use Scalar::Util qw(blessed);
