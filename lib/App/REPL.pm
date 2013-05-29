@@ -61,7 +61,8 @@ sub _read {
 
     $self->_wrapped_plugin('display_prompt');
     my ($line) = $self->_wrapped_plugin('read_line');
-    ($line) = $self->_chained_plugin('mangle_line', $line);
+    ($line) = $self->_chained_plugin('mangle_line', $line)
+        if defined $line;
 
     return $line;
 }
