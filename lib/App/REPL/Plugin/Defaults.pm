@@ -1,12 +1,19 @@
 package App::REPL::Plugin::Defaults;
 
-# don't pollute with strict and warnings for this module
-sub _eval { eval($_[0]) }
+# XXX Eval::Closure imposes its own hints on things that are eval'ed at the
+# moment, but this may be fixed in the future
+BEGIN {
+    our $default_hints = $^H;
+    our $default_hinthash = { %^H };
+    our $default_warning_bits = ${^WARNING_BITS};
+}
 
 use strict;
 use warnings;
 
 use base 'App::REPL::Plugin';
+
+use Eval::Closure;
 
 sub display_prompt {
     my $self = shift;
@@ -20,11 +27,17 @@ sub read_line {
     return scalar <>;
 }
 
+my $PREFIX = "BEGIN { \$^H = \$" . __PACKAGE__ . "::default_hints; \%^H = \%\$" . __PACKAGE__ . "::default_hinthash; \${^WARNING_BITS} = \$" . __PACKAGE__ . "::default_warning_bits }";
+
 sub evaluate {
     my $self = shift;
-    my ($next, $line) = @_;
+    my ($next, $line, %args) = @_;
 
-    return _eval($line);
+    return eval_closure(
+        source      => "$PREFIX; $line",
+        terse_error => 1,
+        %args,
+    );
 }
 
 sub print_error {

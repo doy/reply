@@ -6,6 +6,7 @@ use App::REPL::Plugin::Defaults;
 
 use Module::Runtime qw(compose_module_name use_package_optimistically);
 use Scalar::Util qw(blessed);
+use Try::Tiny;
 
 sub new {
     bless {
@@ -44,12 +45,12 @@ sub run {
     my $self = shift;
 
     while (defined(my $line = $self->_read)) {
-        my @result = $self->_eval($line);
-        if ($@) {
-            $self->_print_error($@);
-        }
-        else {
+        try {
+            my @result = $self->_eval($line);
             $self->_print_result(@result);
+        }
+        catch {
+            $self->_print_error($_);
         }
     }
     print "\n";
