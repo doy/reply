@@ -50,10 +50,10 @@ sub print_error {
 
 sub print_result {
     my $self = shift;
-    my ($next, $result) = @_;
+    my ($next, @result) = @_;
 
-    print $result, "\n"
-        if defined $result;
+    print @result, "\n"
+        if @result;
 }
 
 1;
