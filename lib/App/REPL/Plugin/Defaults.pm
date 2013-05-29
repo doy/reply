@@ -44,7 +44,7 @@ sub print_error {
     my $self = shift;
     my ($next, $error) = @_;
 
-    print $error, "\n"
+    print $error
         if defined $error;
 }
 
