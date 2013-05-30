@@ -104,12 +104,13 @@ sub _read {
 
     my $prompt = $self->_wrapped_plugin('prompt');
     my ($line) = $self->_wrapped_plugin('read_line', $prompt);
+    return if !defined $line;
 
-    if (defined($line) && $line =~ s/^#(\w+)(?:\s+|$)//) {
+    if ($line =~ s/^#(\w+)(?:\s+|$)//) {
         ($line) = $self->_chained_plugin("command_\L$1", $line);
     }
 
-    return $line;
+    return "\n#line 1 \"reply input\"\n$line";
 }
 
 sub _eval {
