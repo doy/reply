@@ -32,7 +32,7 @@ sub compile {
     my ($next, $line, %args) = @_;
 
     return eval_closure(
-        source      => "sub { $PREFIX; $line }",
+        source      => "sub {\n$PREFIX;\n$line\n}",
         terse_error => 1,
         %args,
     );
