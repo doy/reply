@@ -5,4 +5,38 @@ use warnings;
 
 use App::REPL;
 
-App::REPL->new(script => "$ENV{HOME}/.replrc")->run;
+my $cfg = "$ENV{HOME}/.replrc";
+
+my %args = (script => $cfg);
+if (!-e $cfg) {
+    print("$cfg not found. Generating a default...\n");
+    if (open my $fh, '>', $cfg) {
+        print $fh <DATA>;
+        close $fh;
+    }
+    else {
+        warn "Couldn't write to $cfg";
+        %args = ();
+    }
+}
+
+App::REPL->new(%args)->run;
+
+__DATA__
+load_plugin
+    'Interrupt',
+
+    'FancyPrompt',
+    'DataDumper',
+
+    'Colors',
+    'ReadLine',
+    'Hints',
+    'Packages',
+    'LexicalPersistence',
+    ;
+
+postlude <<POSTLUDE;
+use strict;
+use warnings;
+POSTLUDE
