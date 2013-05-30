@@ -94,7 +94,8 @@ sub run {
         }
         catch {
             $self->_print_error($_);
-        }
+        };
+        $self->_loop;
     }
     print "\n";
 }
@@ -138,6 +139,12 @@ sub _print_result {
 
     @result = $self->_chained_plugin('mangle_result', @result);
     $self->_wrapped_plugin('print_result', @result);
+}
+
+sub _loop {
+    my $self = shift;
+
+    $self->_chained_plugin('loop');
 }
 
 sub _wrapped_plugin {

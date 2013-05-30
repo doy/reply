@@ -14,7 +14,12 @@ sub new {
 sub prompt {
     my $self = shift;
     my ($next) = @_;
-    return $self->{counter}++ . $next->();
+    return $self->{counter} . $next->();
+}
+
+sub loop {
+    my $self = shift;
+    $self->{counter}++;
 }
 
 1;
