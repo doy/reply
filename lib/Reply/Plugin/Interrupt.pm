@@ -1,8 +1,8 @@
-package App::REPL::Plugin::Interrupt;
+package Reply::Plugin::Interrupt;
 use strict;
 use warnings;
 
-use base 'App::REPL::Plugin';
+use base 'Reply::Plugin';
 
 sub compile {
     my $self = shift;

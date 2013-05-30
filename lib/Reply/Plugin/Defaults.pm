@@ -1,4 +1,4 @@
-package App::REPL::Plugin::Defaults;
+package Reply::Plugin::Defaults;
 
 # XXX Eval::Closure imposes its own hints on things that are eval'ed at the
 # moment, but this may be fixed in the future
@@ -11,7 +11,7 @@ BEGIN {
 use strict;
 use warnings;
 
-use base 'App::REPL::Plugin';
+use base 'Reply::Plugin';
 
 use Eval::Closure;
 

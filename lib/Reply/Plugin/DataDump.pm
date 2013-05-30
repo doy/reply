@@ -1,8 +1,8 @@
-package App::REPL::Plugin::DataDump;
+package Reply::Plugin::DataDump;
 use strict;
 use warnings;
 
-use base 'App::REPL::Plugin';
+use base 'Reply::Plugin';
 
 use Data::Dump 'pp';
 

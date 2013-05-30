@@ -1,8 +1,8 @@
-package App::REPL::Plugin::Colors;
+package Reply::Plugin::Colors;
 use strict;
 use warnings;
 
-use base 'App::REPL::Plugin';
+use base 'Reply::Plugin';
 
 use Term::ANSIColor;
 

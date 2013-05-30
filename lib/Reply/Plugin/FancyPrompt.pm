@@ -1,8 +1,8 @@
-package App::REPL::Plugin::FancyPrompt;
+package Reply::Plugin::FancyPrompt;
 use strict;
 use warnings;
 
-use base 'App::REPL::Plugin';
+use base 'Reply::Plugin';
 
 sub new {
     my $class = shift;

@@ -1,4 +1,4 @@
-package App::REPL::Plugin::Hints;
+package Reply::Plugin::Hints;
 
 my $default_hints;
 my $default_hinthash;
@@ -12,7 +12,7 @@ BEGIN {
 use strict;
 use warnings;
 
-use base 'App::REPL::Plugin';
+use base 'Reply::Plugin';
 
 sub new {
     my $class = shift;

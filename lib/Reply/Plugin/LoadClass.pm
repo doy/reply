@@ -1,8 +1,8 @@
-package App::REPL::Plugin::LoadClass;
+package Reply::Plugin::LoadClass;
 use strict;
 use warnings;
 
-use base 'App::REPL::Plugin';
+use base 'Reply::Plugin';
 
 use Module::Runtime 'use_package_optimistically';
 use Try::Tiny;

@@ -1,7 +1,7 @@
-package App::REPL;
+package Reply;
 use strict;
 use warnings;
-# ABSTRACT: simple, pluggable repl
+# ABSTRACT: read, eval, print, loop, yay!
 
 use Config::INI::Reader::Ordered;
 use Module::Runtime qw(compose_module_name use_package_optimistically);
@@ -12,10 +12,10 @@ sub new {
     my $class = shift;
     my %opts = @_;
 
-    require App::REPL::Plugin::Defaults;
+    require Reply::Plugin::Defaults;
     my $self = bless {
         plugins         => [],
-        _default_plugin => App::REPL::Plugin::Defaults->new,
+        _default_plugin => Reply::Plugin::Defaults->new,
     }, $class;
 
     $self->load_plugin($_) for @{ $opts{plugins} || [] };
@@ -34,10 +34,10 @@ sub load_plugin {
     my ($plugin, $opts) = @_;
 
     if (!blessed($plugin)) {
-        $plugin = compose_module_name("App::REPL::Plugin", $plugin);
+        $plugin = compose_module_name("Reply::Plugin", $plugin);
         use_package_optimistically($plugin);
         die "$plugin is not a valid plugin"
-            unless $plugin->isa("App::REPL::Plugin");
+            unless $plugin->isa("Reply::Plugin");
         $plugin = $plugin->new(%$opts);
     }
 

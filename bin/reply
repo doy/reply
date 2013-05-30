@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-# PODNAME: repl
+# PODNAME: reply
 
-use App::REPL;
+use Reply;
 
-my $cfg = "$ENV{HOME}/.replrc";
+my $cfg = "$ENV{HOME}/.replyrc";
 
 my %args = (config => $cfg);
 if (!-e $cfg) {
@@ -20,7 +20,7 @@ if (!-e $cfg) {
     }
 }
 
-App::REPL->new(%args)->run;
+Reply->new(%args)->run;
 
 __DATA__
 script_line1 = use strict

@@ -1,4 +1,4 @@
-package App::REPL::Plugin;
+package Reply::Plugin;
 use strict;
 use warnings;
 

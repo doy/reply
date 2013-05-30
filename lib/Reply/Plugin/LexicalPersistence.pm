@@ -1,8 +1,8 @@
-package App::REPL::Plugin::LexicalPersistence;
+package Reply::Plugin::LexicalPersistence;
 use strict;
 use warnings;
 
-use base 'App::REPL::Plugin';
+use base 'Reply::Plugin';
 
 use Lexical::Persistence;
 

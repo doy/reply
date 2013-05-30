@@ -1,8 +1,8 @@
-package App::REPL::Plugin::Packages;
+package Reply::Plugin::Packages;
 use strict;
 use warnings;
 
-use base 'App::REPL::Plugin';
+use base 'Reply::Plugin';
 
 sub new {
     my $class = shift;

@@ -1,8 +1,8 @@
-package App::REPL::Plugin::ReadLine;
+package Reply::Plugin::ReadLine;
 use strict;
 use warnings;
 
-use base 'App::REPL::Plugin';
+use base 'Reply::Plugin';
 
 use Term::ReadLine;
 
@@ -10,7 +10,7 @@ sub new {
     my $class = shift;
 
     my $self = $class->SUPER::new(@_);
-    $self->{term} = Term::ReadLine->new('App::REPL');
+    $self->{term} = Term::ReadLine->new('Reply');
 
     return $self;
 }
