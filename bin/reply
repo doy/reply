@@ -3,9 +3,12 @@ use strict;
 use warnings;
 # PODNAME: reply
 
+use File::HomeDir;
+use File::Spec;
+
 use Reply;
 
-my $cfg = "$ENV{HOME}/.replyrc";
+my $cfg = File::Spec->catfile(File::HomeDir->my_home, ".replyrc");
 
 my %args = (config => $cfg);
 if (!-e $cfg) {
