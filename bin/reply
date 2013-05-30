@@ -33,7 +33,7 @@ Reply->new(%args)->run;
 __DATA__
 script_line1 = use strict
 script_line2 = use warnings
-script_line2 = use 5.XXX
+script_line3 = use 5.XXX
 
 [Interrupt]
 [FancyPrompt]
