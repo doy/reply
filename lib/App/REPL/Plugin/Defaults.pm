@@ -27,7 +27,7 @@ sub read_line {
 
 my $PREFIX = "package main; BEGIN { \$^H = \$" . __PACKAGE__ . "::default_hints; \%^H = \%\$" . __PACKAGE__ . "::default_hinthash; \${^WARNING_BITS} = \$" . __PACKAGE__ . "::default_warning_bits }";
 
-sub evaluate {
+sub compile {
     my $self = shift;
     my ($next, $line, %args) = @_;
 
@@ -35,7 +35,14 @@ sub evaluate {
         source      => "sub { $PREFIX; $line }",
         terse_error => 1,
         %args,
-    )->();
+    );
+}
+
+sub execute {
+    my $self = shift;
+    my ($next, $code) = @_;
+
+    return $code->();
 }
 
 sub print_error {

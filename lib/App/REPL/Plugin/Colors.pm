@@ -17,7 +17,15 @@ sub new {
     return $self;
 }
 
-sub evaluate {
+sub compile {
+    my $self = shift;
+    my ($next, @args) = @_;
+
+    local $SIG{__WARN__} = sub { $self->print_warn(@_) };
+    $next->(@args);
+}
+
+sub execute {
     my $self = shift;
     my ($next, @args) = @_;
 

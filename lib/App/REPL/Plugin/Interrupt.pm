@@ -4,12 +4,20 @@ use warnings;
 
 use base 'App::REPL::Plugin';
 
-sub evaluate {
+sub compile {
     my $self = shift;
-    my ($next, $line, %args) = @_;
+    my ($next, @args) = @_;
 
     local $SIG{INT} = sub { die "Interrupted" };
-    $next->($line, %args);
+    $next->(@args);
+}
+
+sub execute {
+    my $self = shift;
+    my ($next, @args) = @_;
+
+    local $SIG{INT} = sub { die "Interrupted" };
+    $next->(@args);
 }
 
 1;

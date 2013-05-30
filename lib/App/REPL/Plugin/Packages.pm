@@ -13,18 +13,23 @@ sub new {
     return $self;
 }
 
-sub evaluate {
+sub mangle_line {
     my $self = shift;
-    my ($next, $line, %args) = @_;
+    my ($line) = @_;
+
+    return "package $self->{package}; $line; BEGIN { \$" . __PACKAGE__ . "::package = __PACKAGE__ }";
+}
+
+sub compile {
+    my $self = shift;
+    my ($next, @args) = @_;
 
     # XXX it'd be nice to avoid using globals here, but we can't use
     # eval_closure's environment parameter since we need to access the
     # information in a BEGIN block
     our $package = $self->{package};
 
-    $line = "package $package; $line; BEGIN { \$" . __PACKAGE__ . "::package = __PACKAGE__ }";
-
-    my @result = $next->($line, %args);
+    my @result = $next->(@args);
 
     $self->{package} = $package;
 

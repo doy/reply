@@ -13,13 +13,19 @@ sub new {
     return $self;
 }
 
-sub evaluate {
+sub compile {
     my $self = shift;
     my ($next, $line, %args) = @_;
 
-    $line = $self->{env}->prepare($line);
+    my %c = %{ $self->{env}->get_context('_') };
+
+    $args{environment} ||= {};
+    $args{environment} = {
+        %{ $args{environment} },
+        (map { $_ => ref($c{$_}) ? $c{$_} : \$c{$_} } keys %c),
+    };
     my ($code) = $next->($line, %args);
-    return $self->{env}->call($code);
+    return $self->{env}->wrap($code);
 }
 
 1;

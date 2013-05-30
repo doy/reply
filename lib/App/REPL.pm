@@ -115,7 +115,8 @@ sub _eval {
     ($line) = $self->_chained_plugin('mangle_line', $line)
         if defined $line;
 
-    return $self->_wrapped_plugin('evaluate', $line);
+    my ($code) = $self->_wrapped_plugin('compile', $line);
+    return $self->_wrapped_plugin('execute', $code);
 }
 
 sub _print_error {
