@@ -3,6 +3,7 @@ use strict;
 use warnings;
 # ABSTRACT: simple, pluggable repl
 
+use Config::INI::Reader::Ordered;
 use Module::Runtime qw(compose_module_name use_package_optimistically);
 use Scalar::Util qw(blessed);
 use Try::Tiny;
@@ -17,30 +18,12 @@ sub new {
         _default_plugin => App::REPL::Plugin::Defaults->new,
     }, $class;
 
-    my @plugins;
-    my $postlude;
-    if (exists $opts{script}) {
-        my $script = do {
-            open my $fh, '<', $opts{script}
-                or die "Can't open $opts{script}: $!";
-            local $/ = undef;
-            <$fh>
-        };
-        local *main::load_plugin = sub {
-            push @plugins, @_;
-        };
-        local *main::postlude = sub {
-            $postlude .= $_[0];
-        };
-        print "Loading configuration from $opts{script}... ";
-        $self->_eval($script);
+    $self->load_plugin($_) for @{ $opts{plugins} || [] };
+
+    if (defined $opts{config}) {
+        print "Loading configuration from $opts{config}... ";
+        $self->load_config($opts{config});
         print "done\n";
-    }
-
-    $self->load_plugin($_) for @{ $opts{plugins} || [] }, @plugins;
-
-    if (defined $postlude) {
-        $self->_eval($postlude);
     }
 
     return $self;
@@ -48,17 +31,48 @@ sub new {
 
 sub load_plugin {
     my $self = shift;
-    my ($plugin) = @_;
+    my ($plugin, $opts) = @_;
 
     if (!blessed($plugin)) {
         $plugin = compose_module_name("App::REPL::Plugin", $plugin);
         use_package_optimistically($plugin);
         die "$plugin is not a valid plugin"
             unless $plugin->isa("App::REPL::Plugin");
-        $plugin = $plugin->new;
+        $plugin = $plugin->new(%$opts);
     }
 
     push @{ $self->{plugins} }, $plugin;
+}
+
+sub load_config {
+    my $self = shift;
+    my ($file) = @_;
+
+    my $data = Config::INI::Reader::Ordered->new->read_file($file);
+
+    my $root_config;
+    for my $section (@$data) {
+        my ($name, $data) = @$section;
+        if ($name eq '_') {
+            $root_config = $data;
+        }
+        else {
+            $self->load_plugin($name => $data);
+        }
+    }
+
+    for my $line (sort grep { /^script_line/ } keys %$root_config) {
+        $self->_eval($root_config->{$line});
+    }
+
+    if (defined(my $file = $root_config->{script_file})) {
+        my $contents = do {
+            open my $fh, '<', $file or die "Couldn't open $file: $!";
+            local $/ = undef;
+            <$fh>
+        };
+        $self->_eval($contents);
+    }
 }
 
 sub plugins {

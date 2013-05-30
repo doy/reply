@@ -7,7 +7,7 @@ use App::REPL;
 
 my $cfg = "$ENV{HOME}/.replrc";
 
-my %args = (script => $cfg);
+my %args = (config => $cfg);
 if (!-e $cfg) {
     print("$cfg not found. Generating a default...\n");
     if (open my $fh, '>', $cfg) {
@@ -23,20 +23,14 @@ if (!-e $cfg) {
 App::REPL->new(%args)->run;
 
 __DATA__
-load_plugin
-    'Interrupt',
+script_line1 = use strict
+script_line2 = use warnings
 
-    'FancyPrompt',
-    'DataDumper',
-
-    'Colors',
-    'ReadLine',
-    'Hints',
-    'Packages',
-    'LexicalPersistence',
-    ;
-
-postlude <<POSTLUDE;
-use strict;
-use warnings;
-POSTLUDE
+[Interrupt]
+[FancyPrompt]
+[DataDumper]
+[Colors]
+[ReadLine]
+[Hints]
+[Packages]
+[LexicalPersistence]
