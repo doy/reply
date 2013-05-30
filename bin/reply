@@ -14,7 +14,12 @@ my %args = (config => $cfg);
 if (!-e $cfg) {
     print("$cfg not found. Generating a default...\n");
     if (open my $fh, '>', $cfg) {
-        print $fh <DATA>;
+        my $contents = do {
+            local $/;
+            <DATA>
+        };
+        $contents =~ s/use 5.XXX/use $]/;
+        print $fh $contents;
         close $fh;
     }
     else {
@@ -28,6 +33,7 @@ Reply->new(%args)->run;
 __DATA__
 script_line1 = use strict
 script_line2 = use warnings
+script_line2 = use 5.XXX
 
 [Interrupt]
 [FancyPrompt]
