@@ -105,6 +105,10 @@ sub _read {
     my $prompt = $self->_wrapped_plugin('prompt');
     my ($line) = $self->_wrapped_plugin('read_line', $prompt);
 
+    if (defined($line) && $line =~ s/^#(\w+)(?:\s+|$)//) {
+        ($line) = $self->_chained_plugin("command_\L$1", $line);
+    }
+
     return $line;
 }
 
