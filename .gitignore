@@ -12,6 +12,6 @@ MANIFEST.bak
 *.sw[po]
 .DS_Store
 .build
-App-REPL-*
+Reply-*
 *.bs
 *.o
