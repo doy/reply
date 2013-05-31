@@ -40,9 +40,9 @@ sub compile {
 
 sub execute {
     my $self = shift;
-    my ($next, $code) = @_;
+    my ($next, $code, @args) = @_;
 
-    return $code->();
+    return $code->(@args);
 }
 
 sub print_error {
