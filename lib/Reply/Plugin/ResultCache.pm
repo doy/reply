@@ -38,4 +38,11 @@ sub execute {
     return @res;
 }
 
+sub mangle_result {
+    my $self = shift;
+    my ($result) = @_;
+
+    return '$res[' . $#{ $self->{results} } . '] = ' . $result;
+}
+
 1;
