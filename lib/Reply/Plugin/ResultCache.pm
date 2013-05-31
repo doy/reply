@@ -44,6 +44,7 @@ sub mangle_result {
     my $self = shift;
     my ($result) = @_;
 
+    return unless defined $result;
     return '$' . $self->{result_name} . '[' . $#{ $self->{results} } . '] = '
          . $result;
 }
