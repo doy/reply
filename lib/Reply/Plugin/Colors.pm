@@ -8,11 +8,12 @@ use Term::ANSIColor;
 
 sub new {
     my $class = shift;
+    my %opts = @_;
 
     my $self = $class->SUPER::new(@_);
-    $self->{error} = 'red';
-    $self->{warning} = 'yellow';
-    $self->{result} = 'green';
+    $self->{error} = $opts{error} || 'red';
+    $self->{warning} = $opts{warning} || 'yellow';
+    $self->{result} = $opts{result} || 'green';
 
     return $self;
 }

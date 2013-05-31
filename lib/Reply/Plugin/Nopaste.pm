@@ -11,9 +11,11 @@ use App::Nopaste;
 
 sub new {
     my $class = shift;
+    my %opts = @_;
 
     my $self = $class->SUPER::new(@_);
     $self->{history} = '';
+    $self->{service} = $opts{service};
 
     return $self;
 }
@@ -68,6 +70,9 @@ sub command_nopaste {
         text => $self->{history},
         desc => $line,
         lang => 'perl',
+        (defined $self->{service}
+            ? (services => [ $self->{service} ])
+            : ()),
     );
 
     return '';

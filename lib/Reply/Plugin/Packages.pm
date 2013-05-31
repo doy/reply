@@ -6,9 +6,10 @@ use base 'Reply::Plugin';
 
 sub new {
     my $class = shift;
+    my %opts = @_;
 
     my $self = $class->SUPER::new(@_);
-    $self->{package} = 'main';
+    $self->{package} = $opts{default_package} || 'main';
 
     return $self;
 }

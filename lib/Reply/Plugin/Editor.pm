@@ -10,9 +10,14 @@ use Proc::InvokeEditor;
 
 sub new {
     my $class = shift;
+    my %opts = @_;
 
     my $self = $class->SUPER::new(@_);
-    $self->{editor} = Proc::InvokeEditor->new;
+    $self->{editor} = Proc::InvokeEditor->new(
+        (defined $opts{editor}
+            ? (editors => [ $opts{editor} ])
+            : ())
+    );
     $self->{current_text} = '';
 
     return $self;

@@ -6,9 +6,11 @@ use base 'Reply::Plugin';
 
 sub new {
     my $class = shift;
+    my %opts = @_;
 
     my $self = $class->SUPER::new(@_);
     $self->{results} = [];
+    $self->{result_name} = $opts{variable} || 'res';
 
     return $self;
 }
@@ -18,7 +20,7 @@ sub compile {
     my ($next, $line, %args) = @_;
 
     $args{environment} ||= {};
-    $args{environment}{'@res'} = $self->{results};
+    $args{environment}{'@' . $self->{result_name}} = $self->{results};
 
     $next->($line, %args);
 }
@@ -42,7 +44,8 @@ sub mangle_result {
     my $self = shift;
     my ($result) = @_;
 
-    return '$res[' . $#{ $self->{results} } . '] = ' . $result;
+    return '$' . $self->{result_name} . '[' . $#{ $self->{results} } . '] = '
+         . $result;
 }
 
 1;
