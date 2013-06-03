@@ -22,7 +22,7 @@ sub new {
 
     if (defined $opts{config}) {
         print "Loading configuration from $opts{config}... ";
-        $self->load_config($opts{config});
+        $self->_load_config($opts{config});
         print "done\n";
     }
 
@@ -44,7 +44,23 @@ sub load_plugin {
     push @{ $self->{plugins} }, $plugin;
 }
 
-sub load_config {
+sub run {
+    my $self = shift;
+
+    while (defined(my $line = $self->_read)) {
+        try {
+            my @result = $self->_eval($line);
+            $self->_print_result(@result);
+        }
+        catch {
+            $self->_print_error($_);
+        };
+        $self->_loop;
+    }
+    print "\n";
+}
+
+sub _load_config {
     my $self = shift;
     my ($file) = @_;
 
@@ -75,29 +91,13 @@ sub load_config {
     }
 }
 
-sub plugins {
+sub _plugins {
     my $self = shift;
 
     return (
         @{ $self->{plugins} },
         $self->{_default_plugin},
     );
-}
-
-sub run {
-    my $self = shift;
-
-    while (defined(my $line = $self->_read)) {
-        try {
-            my @result = $self->_eval($line);
-            $self->_print_result(@result);
-        }
-        catch {
-            $self->_print_error($_);
-        };
-        $self->_loop;
-    }
-    print "\n";
 }
 
 sub _read {
@@ -149,7 +149,7 @@ sub _loop {
 
 sub _wrapped_plugin {
     my $self = shift;
-    my @plugins = ref($_[0]) ? @{ shift() } : $self->plugins;
+    my @plugins = ref($_[0]) ? @{ shift() } : $self->_plugins;
     my ($method, @args) = @_;
 
     @plugins = grep { $_->can($method) } @plugins;
@@ -164,7 +164,7 @@ sub _wrapped_plugin {
 
 sub _chained_plugin {
     my $self = shift;
-    my @plugins = ref($_[0]) ? @{ shift() } : $self->plugins;
+    my @plugins = ref($_[0]) ? @{ shift() } : $self->_plugins;
     my ($method, @args) = @_;
 
     @plugins = grep { $_->can($method) } @plugins;
