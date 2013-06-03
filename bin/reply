@@ -59,3 +59,4 @@ script_line3 = use 5.XXX
 [Hints]
 [Packages]
 [LexicalPersistence]
+[ResultCache]
