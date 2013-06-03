@@ -76,4 +76,9 @@ sub command_e {
     return $text;
 }
 
+=for Pod::Coverage
+  command_e
+
+=cut
+
 1;

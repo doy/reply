@@ -84,4 +84,9 @@ sub print_warn {
     print color('reset');
 }
 
+=for Pod::Coverage
+  print_warn
+
+=cut
+
 1;

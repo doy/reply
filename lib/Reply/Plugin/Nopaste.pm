@@ -96,4 +96,9 @@ sub command_nopaste {
     return '';
 }
 
+=for Pod::Coverage
+  command_nopaste
+
+=cut
+
 1;

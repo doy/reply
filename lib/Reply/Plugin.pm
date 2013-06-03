@@ -121,4 +121,9 @@ parameters and returns nothing.
 
 sub new { bless {}, shift }
 
+=for Pod::Coverage
+  new
+
+=cut
+
 1;
