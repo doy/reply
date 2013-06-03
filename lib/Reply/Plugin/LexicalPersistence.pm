@@ -1,10 +1,24 @@
 package Reply::Plugin::LexicalPersistence;
 use strict;
 use warnings;
+# ABSTRACT: persists lexical variables between lines
 
 use base 'Reply::Plugin';
 
 use Lexical::Persistence;
+
+=head1 SYNOPSIS
+
+  ; .replyrc
+  [LexicalPersistence]
+
+=head1 DESCRIPTION
+
+This plugin persists the values of lexical variables between input lines. For
+instance, with this plugin you can enter C<my $x = 2> into the Reply shell, and
+then use C<$x> as expected in subsequent lines.
+
+=cut
 
 sub new {
     my $class = shift;

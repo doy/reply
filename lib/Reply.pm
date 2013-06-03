@@ -8,6 +8,71 @@ use Module::Runtime qw(compose_module_name use_package_optimistically);
 use Scalar::Util qw(blessed);
 use Try::Tiny;
 
+=head1 SYNOPSIS
+
+  use Reply;
+
+  Reply->new(config => "$ENV{HOME}/.replyrc")->run;
+
+=head1 DESCRIPTION
+
+Reply is a lightweight, extensible REPL for Perl. It is plugin-based (see
+L<Reply::Plugin>), and through plugins supports many advanced features such as
+coloring and pretty printing, readline support, and pluggable commands.
+
+=head1 CONFIGURATION
+
+Configuration uses an INI-style format similar to the configuration format of
+L<Dist::Zilla>. Section names are used as the names of plugins, and any options
+within a section are passed as arguments to that plugin. Plugins are loaded in
+order as they are listed in the configuration file, which can affect the
+results in some cases where multiple plugins are hooking into a single callback
+(see L<Reply::Plugin> for more information).
+
+In addition to plugin configuration, there are some additional options
+recognized. These must be specified at the top of the file, before any section
+headers.
+
+=over 4
+
+=item script_file
+
+This contains a filename whose contents will be evaluated as perl code once the
+configuration is done being loaded.
+
+=item script_lineI<n>
+
+Any options that start with C<script_line> will be sorted by their key and then
+each value will be evaluated individually once the configuration is done being
+loaded.
+
+NOTE: this is currently a hack due to the fact that L<Config::INI> doesn't
+support multiple keys with the same name in a section. This may be fixed in the
+future to just allow specifying C<script_line> multiple times.
+
+=back
+
+=cut
+
+=method new(%opts)
+
+Creates a new Reply instance. Valid options are:
+
+=over 4
+
+=item config
+
+Name of a configuration file to load. This should contain INI-style
+configuration for plugins as described above.
+
+=item plugins
+
+An arrayref of additional plugins to load.
+
+=back
+
+=cut
+
 sub new {
     my $class = shift;
     my %opts = @_;
@@ -29,6 +94,14 @@ sub new {
     return $self;
 }
 
+=method load_plugin($plugin, $opts)
+
+Loads the specified plugin. C<$plugin> corresponds to the class
+C<Reply::Plugin::$plugin>, which will be loaded and instantiated. If C<$opts>
+is given, it should be a hashref of options to pass to the plugin constructor.
+
+=cut
+
 sub load_plugin {
     my $self = shift;
     my ($plugin, $opts) = @_;
@@ -43,6 +116,13 @@ sub load_plugin {
 
     push @{ $self->{plugins} }, $plugin;
 }
+
+=method run
+
+Runs the repl. Will continue looping until the C<read_line> callback returns
+undef.
+
+=cut
 
 sub run {
     my $self = shift;
@@ -175,5 +255,47 @@ sub _chained_plugin {
 
     return @args;
 }
+
+=head1 BUGS
+
+No known bugs.
+
+Please report any bugs through RT: email
+C<bug-reply at rt.cpan.org>, or browse to
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Reply>.
+
+=head1 SEE ALSO
+
+L<Devel::REPL>
+
+=head1 SUPPORT
+
+You can find this documentation for this module with the perldoc command.
+
+    perldoc Reply
+
+You can also look for information at:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Reply>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Reply>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Reply>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Reply>
+
+=back
+
+=cut
 
 1;

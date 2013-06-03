@@ -1,10 +1,30 @@
 package Reply::Plugin::Colors;
 use strict;
 use warnings;
+# ABSTRACT: colorize output
 
 use base 'Reply::Plugin';
 
 use Term::ANSIColor;
+
+=head1 SYNOPSIS
+
+  ; .replyrc
+  [Colors]
+  error   = bright red
+  warning = bright yellow
+  result  = bright green
+
+=head1 DESCRIPTION
+
+This plugin adds coloring to the results when they are printed to the screen.
+By default, errors are C<red>, warnings are C<yellow>, and normal results are
+C<green>, although this can be overridden through configuration as shown in the
+synopsis. L<Term::ANSIColor> is used to generate the colors, so any value that
+is accepted by that module is a valid value for the C<error>, C<warning>, and
+C<result> options.
+
+=cut
 
 sub new {
     my $class = shift;

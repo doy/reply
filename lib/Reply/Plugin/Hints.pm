@@ -11,8 +11,23 @@ BEGIN {
 
 use strict;
 use warnings;
+# ABSTRACT: persists lexical hints across input lines
 
 use base 'Reply::Plugin';
+
+=head1 SYNOPSIS
+
+  ; .replyrc
+  [Hints]
+
+=head1 DESCRIPTION
+
+This plugin persists the values of various compile time lexical hints between
+evaluated lines. This means, for instance, that entering a line like C<use
+strict> at the Reply prompt will cause C<strict> to be enabled for all future
+lines (at least until C<no strict> is given).
+
+=cut
 
 sub new {
     my $class = shift;

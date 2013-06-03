@@ -1,13 +1,31 @@
 package Reply::Plugin::Nopaste;
 use strict;
 use warnings;
+# ABSTRACT: command to nopaste a transcript of the current session
 
 use base 'Reply::Plugin';
 
 use App::Nopaste;
 
-# XXX note that this has to be loaded early, in order to catch all of the
-# appropriate manipulations that plugins do ([DataDump], etc)
+=head1 SYNOPSIS
+
+  ; .replyrc
+  [Nopaste]
+  service = Gist
+
+=head1 DESCRIPTION
+
+This plugin provides a C<#nopaste> command, which will use L<App::Nopaste> to
+nopaste a transcript of the current Reply session. The C<service> option can be
+used to choose an alternate service to use, rather than using the one that
+App::Nopaste chooses on its own. If arguments are passed to the C<#nopaste>
+command, they will be used as the title of the paste.
+
+Note that this plugin should be loaded early in your configuration file, in
+order to ensure that it sees all modifications to the result (due to plugins
+like [DataDump], etc).
+
+=cut
 
 sub new {
     my $class = shift;

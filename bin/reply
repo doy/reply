@@ -2,11 +2,27 @@
 use strict;
 use warnings;
 # PODNAME: reply
+# ABSTRACT: read, eval, print, loop, yay!
 
 use File::HomeDir;
 use File::Spec;
 
 use Reply;
+
+=head1 SYNOPSIS
+
+  reply
+
+=head1 DESCRIPTION
+
+This script runs the L<Reply> shell. It looks for a configuration file in
+C<.replyrc> in your home directory, and will generate a basic configuration for
+you if that file does not exist.
+
+See the L<Reply> documentation for more information about using and configuring
+this program.
+
+=cut
 
 my $cfg = File::Spec->catfile(File::HomeDir->my_home, ".replyrc");
 
