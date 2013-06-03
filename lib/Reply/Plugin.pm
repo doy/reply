@@ -61,10 +61,10 @@ single line from the user.
 
 =item command_C<$name> (chained)
 
-If the line read from the user is of the form "#foo args...", then plugins will
-be searched for a callback method named C<command_foo>. This callback takes a
-single string containing the provided arguments, and returns a new line to
-evaluate instead, if any.
+If the line read from the user is of the form C<"#foo args...">, then plugins
+will be searched for a callback method named C<command_foo>. This callback
+takes a single string containing the provided arguments, and returns a new line
+to evaluate instead, if any.
 
 =item mangle_line (chained)
 

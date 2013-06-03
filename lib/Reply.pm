@@ -43,7 +43,7 @@ headers.
 This contains a filename whose contents will be evaluated as perl code once the
 configuration is done being loaded.
 
-=item script_lineI<n>
+=item script_line<I<n>>
 
 Any options that start with C<script_line> will be sorted by their key and then
 each value will be evaluated individually once the configuration is done being
