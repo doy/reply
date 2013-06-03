@@ -18,7 +18,15 @@ sub mangle_line {
     my $self = shift;
     my ($line) = @_;
 
-    return "package $self->{package};\n$line\n;BEGIN { \$" . __PACKAGE__ . "::package = __PACKAGE__ }";
+    my $package = __PACKAGE__;
+    return <<LINE;
+package $self->{package};
+$line
+;
+BEGIN {
+    \$${package}::package = __PACKAGE__;
+}
+LINE
 }
 
 sub compile {

@@ -25,7 +25,14 @@ sub read_line {
     return scalar <>;
 }
 
-my $PREFIX = "package main; BEGIN { \$^H = \$" . __PACKAGE__ . "::default_hints; \%^H = \%\$" . __PACKAGE__ . "::default_hinthash; \${^WARNING_BITS} = \$" . __PACKAGE__ . "::default_warning_bits }";
+(my $PREFIX = <<'PREFIX') =~ s/__PACKAGE__/__PACKAGE__/ge;
+package main;
+BEGIN {
+    $^H = $__PACKAGE__::default_hints;
+    %^H = %$__PACKAGE__::default_hinthash;
+    ${^WARNING_BITS} = $__PACKAGE__::default_warning_bits;
+}
+PREFIX
 
 sub compile {
     my $self = shift;

@@ -29,7 +29,21 @@ sub mangle_line {
     my $self = shift;
     my ($line) = @_;
 
-    return "BEGIN { \$^H = \$" . __PACKAGE__ . "::hints; \%^H = \%\$" . __PACKAGE__ . "::hinthash; \${^WARNING_BITS} = \$" . __PACKAGE__ . "::warning_bits }\n$line\n;BEGIN { \$" . __PACKAGE__ . "::hints = \$^H; \$" . __PACKAGE__ . "::hinthash = \\\%^H; \$" . __PACKAGE__ . "::warning_bits = \${^WARNING_BITS} }";
+    my $package = __PACKAGE__;
+    return <<LINE;
+BEGIN {
+    \$^H = \$${package}::hints;
+    \%^H = \%\$${package}::hinthash;
+    \${^WARNING_BITS} = \$${package}::warning_bits;
+}
+$line
+;
+BEGIN {
+    \$${package}::hints = \$^H;
+    \$${package}::hinthash = \\\%^H;
+    \$${package}::warning_bits = \${^WARNING_BITS};
+}
+LINE
 }
 
 sub compile {
