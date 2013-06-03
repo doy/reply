@@ -75,7 +75,7 @@ sub read_line {
 sub DESTROY {
     my $self = shift;
 
-    return if $self->{history_length} == 0;
+    return if defined $self->{history_length} && $self->{history_length} == 0;
 
     # XXX support more later
     return unless $self->{term}->ReadLine eq 'Term::ReadLine::Gnu';
