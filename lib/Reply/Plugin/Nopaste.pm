@@ -46,7 +46,7 @@ sub print_error {
 sub print_result {
     my $self = shift;
     my ($next, @result) = @_;
-    $self->{result} = join('', @result) . "\n";
+    $self->{result} = @result ? join('', @result) . "\n" : '';
     $next->(@result);
 }
 
