@@ -66,14 +66,14 @@ sub command_nopaste {
 
     $line = "Reply session" unless length $line;
 
-    App::Nopaste->nopaste(
+    print App::Nopaste->nopaste(
         text => $self->{history},
         desc => $line,
         lang => 'perl',
         (defined $self->{service}
             ? (services => [ $self->{service} ])
             : ()),
-    );
+    ) . "\n";
 
     return '';
 }
