@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - fix LexicalPersistence plugin (reported by tokuhirom)
 
 0.02  2013-06-03
       - packaging and pod fixes
