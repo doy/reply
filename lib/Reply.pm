@@ -86,7 +86,7 @@ sub new {
         _default_plugin => Reply::Plugin::Defaults->new,
     }, $class;
 
-    $self->load_plugin($_) for @{ $opts{plugins} || [] };
+    $self->_load_plugin($_) for @{ $opts{plugins} || [] };
 
     if (defined $opts{config}) {
         print "Loading configuration from $opts{config}... ";
@@ -95,29 +95,6 @@ sub new {
     }
 
     return $self;
-}
-
-=method load_plugin($plugin, $opts)
-
-Loads the specified plugin. C<$plugin> corresponds to the class
-C<Reply::Plugin::$plugin>, which will be loaded and instantiated. If C<$opts>
-is given, it should be a hashref of options to pass to the plugin constructor.
-
-=cut
-
-sub load_plugin {
-    my $self = shift;
-    my ($plugin, $opts) = @_;
-
-    if (!blessed($plugin)) {
-        $plugin = compose_module_name("Reply::Plugin", $plugin);
-        use_package_optimistically($plugin);
-        die "$plugin is not a valid plugin"
-            unless $plugin->isa("Reply::Plugin");
-        $plugin = $plugin->new(%$opts);
-    }
-
-    push @{ $self->{plugins} }, $plugin;
 }
 
 =method run
@@ -156,7 +133,7 @@ sub _load_config {
             $root_config = $data;
         }
         else {
-            $self->load_plugin($name => $data);
+            $self->_load_plugin($name => $data);
         }
     }
 
@@ -172,6 +149,21 @@ sub _load_config {
         };
         $self->_eval($contents);
     }
+}
+
+sub _load_plugin {
+    my $self = shift;
+    my ($plugin, $opts) = @_;
+
+    if (!blessed($plugin)) {
+        $plugin = compose_module_name("Reply::Plugin", $plugin);
+        use_package_optimistically($plugin);
+        die "$plugin is not a valid plugin"
+            unless $plugin->isa("Reply::Plugin");
+        $plugin = $plugin->new(%$opts);
+    }
+
+    push @{ $self->{plugins} }, $plugin;
 }
 
 sub _plugins {
