@@ -6,6 +6,7 @@ use warnings;
 
 use File::HomeDir;
 use File::Spec;
+use Getopt::Long;
 
 use Reply;
 
@@ -24,7 +25,19 @@ this program.
 
 =cut
 
-my $cfg = File::Spec->catfile(File::HomeDir->my_home, ".replyrc");
+my $cfgfile = '.replyrc';
+GetOptions(
+    'cfg:s'   => \$cfgfile,
+    'version' => sub { version() },
+    'help'    => sub { usage(0) },
+) or usage(1);
+
+my $cfg = File::Spec->catfile(
+    (File::Spec->file_name_is_absolute($cfgfile)
+        ? ()
+        : (File::HomeDir->my_home)),
+    $cfgfile
+);
 
 my %args = (config => $cfg);
 if (!-e $cfg) {
@@ -45,6 +58,16 @@ if (!-e $cfg) {
 }
 
 Reply->new(%args)->run;
+
+sub usage {
+    print "    reply [--version] [--help] [--cfg file]\n";
+    exit($_[0]);
+}
+
+sub version {
+    print "Reply version $Reply::VERSION\n";
+    exit(0);
+}
 
 __DATA__
 script_line1 = use strict
