@@ -1,6 +1,9 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - add a bit of option parsing to the reply script, to support choosing an
+        alternate configuration file
+      - Data::Printer plugin (creaktive)
 
 0.03  2013-06-03
       - fix LexicalPersistence plugin (reported by tokuhirom)
