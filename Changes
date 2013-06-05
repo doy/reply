@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.05  2013-06-04
       - avoid test failures from DataPrinter, since it's optional
 
 0.04  2013-06-04
