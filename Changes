@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - avoid test failures from DataPrinter, since it's optional
 
 0.04  2013-06-04
       - add a bit of option parsing to the reply script, to support choosing an
