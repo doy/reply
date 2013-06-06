@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - add Timer plugin (Arthur Axel fREW Schmidt)
 
 0.05  2013-06-04
       - avoid test failures from DataPrinter, since it's optional
