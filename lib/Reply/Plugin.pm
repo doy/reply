@@ -112,8 +112,9 @@ implementation just uses C<print> to print them to the screen.
 
 =item loop (chained)
 
-This callback is called at the end of each evaluation. It receives no
-parameters and returns nothing.
+This callback is called at the end of each evaluation. It receives whether the
+repl has been requested to terminate so far, and returns whether the repl
+should terminate.
 
 =back
 

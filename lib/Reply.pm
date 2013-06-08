@@ -102,7 +102,7 @@ sub new {
 =method run
 
 Runs the repl. Will continue looping until the C<read_line> callback returns
-undef.
+undef or the C<loop> callback returns false.
 
 =cut
 
@@ -112,6 +112,15 @@ sub run {
     while ($self->run_one) { }
     print "\n";
 }
+
+=method run_one($line)
+
+Runs a single iteration of the repl. If C<$line> is given, it will be used as
+the string to evaluate (and the C<prompt> and C<read_line> callbacks will not
+be called). Returns true if the repl can continue, and false if it was
+requested to quit.
+
+=cut
 
 sub run_one {
     my $self = shift;
