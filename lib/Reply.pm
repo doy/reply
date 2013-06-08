@@ -86,13 +86,13 @@ sub new {
         _default_plugin => Reply::Plugin::Defaults->new,
     }, $class;
 
-    $self->_load_plugin($_) for @{ $opts{plugins} || [] };
-
     if (defined $opts{config}) {
         print "Loading configuration from $opts{config}... ";
         $self->_load_config($opts{config});
         print "done\n";
     }
+
+    $self->_load_plugin($_) for @{ $opts{plugins} || [] };
 
     return $self;
 }
