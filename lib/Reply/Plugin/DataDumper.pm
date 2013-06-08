@@ -18,6 +18,15 @@ This plugin uses L<Data::Dumper> to format results.
 
 =cut
 
+sub new {
+    my $class = shift;
+
+    $Data::Dumper::Terse = 1;
+    $Data::Dumper::Sortkeys = 1;
+
+    return $class->SUPER::new(@_);
+}
+
 sub mangle_result {
     my $self = shift;
     my (@result) = @_;
