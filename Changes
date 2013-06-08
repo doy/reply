@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.06  2013-06-08
       - add Timer plugin (Arthur Axel fREW Schmidt)
       - fix DataPrinter plugin when ~/.dataprinter has a custom value for
         'alias' (Charles Bailey)
