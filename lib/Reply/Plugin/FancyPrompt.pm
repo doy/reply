@@ -22,19 +22,22 @@ sub new {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
     $self->{counter} = 0;
+    $self->{prompted} = 0;
     return $self;
 }
 
 sub prompt {
     my $self = shift;
     my ($next) = @_;
+    $self->{prompted} = 1;
     return $self->{counter} . $next->();
 }
 
 sub loop {
     my $self = shift;
     my ($continue) = @_;
-    $self->{counter}++;
+    $self->{counter}++ if $self->{prompted};
+    $self->{prompted} = 0;
     $continue;
 }
 

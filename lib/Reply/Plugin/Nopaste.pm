@@ -76,7 +76,10 @@ sub loop {
     my $line   = delete $self->{line};
     my $result = delete $self->{result};
 
-    $self->{history} .= "$prompt$line$result";
+    $self->{history} .= "$prompt$line$result"
+        if defined $prompt
+        && defined $line
+        && defined $result;
 
     $continue;
 }
