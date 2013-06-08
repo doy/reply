@@ -30,7 +30,7 @@ sub new {
 sub mangle_result {
     my $self = shift;
     my (@result) = @_;
-    return Dumper(@result);
+    return Dumper(@result == 0 ? '' : @result == 1 ? $result[0] : \@result);
 }
 
 1;
