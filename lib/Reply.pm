@@ -107,17 +107,31 @@ undef.
 sub run {
     my $self = shift;
 
-    while (defined(my $line = $self->_read)) {
-        try {
-            my @result = $self->_eval($line);
-            $self->_print_result(@result);
-        }
-        catch {
-            $self->_print_error($_);
-        };
-        $self->_loop;
-    }
+    while ($self->run_one) { }
     print "\n";
+}
+
+sub run_one {
+    my $self = shift;
+    my ($line) = @_;
+
+    if (defined $line) {
+        $line = $self->_premangle_line($line);
+    }
+    else {
+        $line = $self->_read;
+    }
+
+    return unless defined $line;
+
+    try {
+        my @result = $self->_eval($line);
+        $self->_print_result(@result);
+    }
+    catch {
+        $self->_print_error($_);
+    };
+    $self->_loop;
 }
 
 sub _load_config {
@@ -182,6 +196,13 @@ sub _read {
     my ($line) = $self->_wrapped_plugin('read_line', $prompt);
     return if !defined $line;
 
+    return $self->_premangle_line($line);
+}
+
+sub _premangle_line {
+    my $self = shift;
+    my ($line) = @_;
+
     if ($line =~ s/^#(\w+)(?:\s+|$)//) {
         ($line) = $self->_chained_plugin("command_\L$1", $line);
     }
@@ -219,7 +240,7 @@ sub _print_result {
 sub _loop {
     my $self = shift;
 
-    $self->_chained_plugin('loop');
+    $self->_chained_plugin('loop', 1);
 }
 
 sub _wrapped_plugin {

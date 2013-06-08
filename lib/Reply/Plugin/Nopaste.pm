@@ -70,12 +70,15 @@ sub print_result {
 
 sub loop {
     my $self = shift;
+    my ($continue) = @_;
 
     my $prompt = delete $self->{prompt};
     my $line   = delete $self->{line};
     my $result = delete $self->{result};
 
     $self->{history} .= "$prompt$line$result";
+
+    $continue;
 }
 
 sub command_nopaste {

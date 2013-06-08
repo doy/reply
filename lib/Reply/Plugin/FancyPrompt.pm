@@ -33,7 +33,9 @@ sub prompt {
 
 sub loop {
     my $self = shift;
+    my ($continue) = @_;
     $self->{counter}++;
+    $continue;
 }
 
 1;
