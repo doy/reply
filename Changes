@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.07  2013-06-08
       - expose a 'step' method to run single iterations of the repl
       - plugins specified in the 'plugins' constructor parameter are now run
         after loading config rather than before (this should give them more
