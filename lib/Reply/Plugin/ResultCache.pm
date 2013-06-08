@@ -36,8 +36,9 @@ sub compile {
     my $self = shift;
     my ($next, $line, %args) = @_;
 
-    $args{environment} ||= {};
-    $args{environment}{'@' . $self->{result_name}} = $self->{results};
+    $args{environments}{''.__PACKAGE__} = {
+        "\@$self->{result_name}" => $self->{results},
+    };
 
     $next->($line, %args);
 }

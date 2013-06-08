@@ -38,6 +38,15 @@ sub compile {
     my $self = shift;
     my ($next, $line, %args) = @_;
 
+    my @envs = (
+        ($args{environment} ? ($args{environment}) : ()),
+        values %{ $args{environments} },
+    );
+
+    if (@envs) {
+        $args{environment} = { map { %$_ } @envs }
+    }
+
     return eval_closure(
         source      => "sub {\n$PREFIX;\n$line\n}",
         terse_error => 1,
