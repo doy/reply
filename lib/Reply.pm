@@ -3,10 +3,11 @@ use strict;
 use warnings;
 # ABSTRACT: read, eval, print, loop, yay!
 
-use Config::INI::Reader::Ordered;
 use Module::Runtime qw(compose_module_name use_package_optimistically);
 use Scalar::Util qw(blessed);
 use Try::Tiny;
+
+use Reply::Config;
 
 =head1 SYNOPSIS
 
@@ -87,9 +88,10 @@ sub new {
     }, $class;
 
     if (defined $opts{config}) {
-        print "Loading configuration from $opts{config}... ";
+        if (!ref($opts{config})) {
+            $opts{config} = Reply::Config->new(file => $opts{config});
+        }
         $self->_load_config($opts{config});
-        print "done\n";
     }
 
     $self->_load_plugin($_) for @{ $opts{plugins} || [] };
@@ -136,9 +138,9 @@ sub run_one {
 
 sub _load_config {
     my $self = shift;
-    my ($file) = @_;
+    my ($config) = @_;
 
-    my $data = Config::INI::Reader::Ordered->new->read_file($file);
+    my $data = $config->data;
 
     my $root_config;
     for my $section (@$data) {
