@@ -1,6 +1,18 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - expose a 'step' method to run single iterations of the repl
+      - plugins specified in the 'plugins' constructor parameter are now run
+        after loading config rather than before (this should give them more
+        control over what actually runs - if this is a problem, i might add
+        separate options for "before config" and "after config")
+      - config handling is split out into a separate Reply::Config class for
+        better reuse of the config loading logic
+      - DataDumper plugin now sets Terse and Sortkeys, since that produces
+        output that looks better
+      - plugins can now set multiple independent lexical environments, to allow
+        them to override the actual logical environment without wiping out
+        special vars set by other plugins
 
 0.06  2013-06-08
       - add Timer plugin (Arthur Axel fREW Schmidt)
