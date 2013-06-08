@@ -154,7 +154,7 @@ sub _load_config {
     }
 
     for my $line (sort grep { /^script_line/ } keys %$root_config) {
-        $self->_eval($root_config->{$line});
+        $self->run_one($root_config->{$line});
     }
 
     if (defined(my $file = $root_config->{script_file})) {
@@ -163,7 +163,7 @@ sub _load_config {
             local $/ = undef;
             <$fh>
         };
-        $self->_eval($contents);
+        $self->run_one($contents);
     }
 }
 
