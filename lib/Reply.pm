@@ -109,11 +109,14 @@ undef or the C<loop> callback returns false.
 sub run {
     my $self = shift;
 
-    while ($self->run_one) { }
+    while (1) {
+        my $continue = $self->step;
+        last unless $continue;
+    }
     print "\n";
 }
 
-=method run_one($line)
+=method step($line)
 
 Runs a single iteration of the repl. If C<$line> is given, it will be used as
 the string to evaluate (and the C<prompt> and C<read_line> callbacks will not
@@ -122,18 +125,15 @@ requested to quit.
 
 =cut
 
-sub run_one {
+sub step {
     my $self = shift;
     my ($line) = @_;
 
-    if (defined $line) {
-        $line = $self->_premangle_line($line);
-    }
-    else {
-        $line = $self->_read;
-    }
+    $line = $self->_read unless defined $line;
 
     return unless defined $line;
+
+    $line = $self->_preprocess_line($line);
 
     try {
         my @result = $self->_eval($line);
@@ -163,7 +163,7 @@ sub _load_config {
     }
 
     for my $line (sort grep { /^script_line/ } keys %$root_config) {
-        $self->run_one($root_config->{$line});
+        $self->step($root_config->{$line});
     }
 
     if (defined(my $file = $root_config->{script_file})) {
@@ -172,7 +172,7 @@ sub _load_config {
             local $/ = undef;
             <$fh>
         };
-        $self->run_one($contents);
+        $self->step($contents);
     }
 }
 
@@ -204,13 +204,10 @@ sub _read {
     my $self = shift;
 
     my $prompt = $self->_wrapped_plugin('prompt');
-    my ($line) = $self->_wrapped_plugin('read_line', $prompt);
-    return if !defined $line;
-
-    return $self->_premangle_line($line);
+    return $self->_wrapped_plugin('read_line', $prompt);
 }
 
-sub _premangle_line {
+sub _preprocess_line {
     my $self = shift;
     my ($line) = @_;
 
