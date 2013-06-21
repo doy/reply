@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - add AutoRefresh plugin (Michael Reddick)
 
 0.07  2013-06-08
       - expose a 'step' method to run single iterations of the repl
