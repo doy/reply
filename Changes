@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - fix tests
 
 0.08  2013-06-21
       - add AutoRefresh plugin (Michael Reddick)
