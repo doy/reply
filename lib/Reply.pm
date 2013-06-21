@@ -302,21 +302,21 @@ You can also look for information at:
 
 =over 4
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * MetaCPAN
 
-L<http://annocpan.org/dist/Reply>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Reply>
+L<https://metacpan.org/release/Reply>
 
 =item * RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Reply>
 
-=item * Search CPAN
+=item * Github
 
-L<http://search.cpan.org/dist/Reply>
+L<https://github.com/doy/reply>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Reply>
 
 =back
 
