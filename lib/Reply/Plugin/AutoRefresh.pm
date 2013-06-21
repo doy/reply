@@ -1,7 +1,7 @@
 package Reply::Plugin::AutoRefresh;
 use strict;
 use warnings;
-# ABSTRACT: provides a more informative prompt
+# ABSTRACT: automatically refreshes the external code you use
 
 use base 'Reply::Plugin';
 use Class::Refresh;
@@ -13,9 +13,9 @@ use Class::Refresh;
 
 =head1 DESCRIPTION
 
-This plugin automatically refreshes all loaded modules after every
+This plugin automatically refreshes all loaded modules before every
 statement execution. It's useful if you are working on a module in
-a file and you want the changes to automatically be loaded in reply.
+a file and you want the changes to automatically be loaded in Reply.
 
 =cut
 
@@ -26,4 +26,5 @@ sub execute {
     Class::Refresh->refresh;
     $next->(@args);
 }
+
 1;
