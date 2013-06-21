@@ -4,7 +4,7 @@ use warnings;
 # ABSTRACT: automatically refreshes the external code you use
 
 use base 'Reply::Plugin';
-use Class::Refresh;
+use Class::Refresh 0.04;
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ a file and you want the changes to automatically be loaded in Reply.
 
 =cut
 
-sub execute {
+sub compile {
     my $self = shift;
     my ($next, @args) = @_;
 
