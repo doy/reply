@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.08  2013-06-21
       - add AutoRefresh plugin (Michael Reddick)
 
 0.07  2013-06-08
