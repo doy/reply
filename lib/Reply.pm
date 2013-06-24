@@ -3,7 +3,7 @@ use strict;
 use warnings;
 # ABSTRACT: read, eval, print, loop, yay!
 
-use Module::Runtime qw(compose_module_name use_package_optimistically);
+use Module::Runtime qw(compose_module_name require_module);
 use Scalar::Util qw(blessed);
 use Try::Tiny;
 
@@ -182,7 +182,7 @@ sub _load_plugin {
 
     if (!blessed($plugin)) {
         $plugin = compose_module_name("Reply::Plugin", $plugin);
-        use_package_optimistically($plugin);
+        require_module($plugin);
         die "$plugin is not a valid plugin"
             unless $plugin->isa("Reply::Plugin");
         $plugin = $plugin->new(%$opts);
