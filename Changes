@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - report failure to load of plugins which use modules that fail to load
+        (reported by Michael Reddick)
 
 0.10  2013-06-24
       - don't pollute main::, since that's where the default configuration
