@@ -4,10 +4,7 @@ use warnings;
 # PODNAME: reply
 # ABSTRACT: read, eval, print, loop, yay!
 
-use Getopt::Long;
-
-use Reply;
-use Reply::Config;
+use Reply::App;
 
 =head1 SYNOPSIS
 
@@ -24,57 +21,4 @@ this program.
 
 =cut
 
-my $cfgfile = '.replyrc';
-GetOptions(
-    'cfg:s'   => \$cfgfile,
-    'version' => sub { version() },
-    'help'    => sub { usage(0) },
-) or usage(1);
-
-my $cfg = Reply::Config->new(file => $cfgfile);
-
-my %args = (config => $cfg);
-my $file = $cfg->file;
-if (!-e $file) {
-    print("$file not found. Generating a default...\n");
-    if (open my $fh, '>', $file) {
-        my $contents = do {
-            local $/;
-            <DATA>
-        };
-        $contents =~ s/use 5.XXX/use $]/;
-        print $fh $contents;
-        close $fh;
-    }
-    else {
-        warn "Couldn't write to $file";
-        %args = ();
-    }
-}
-
-Reply->new(%args)->run;
-
-sub usage {
-    print "    reply [--version] [--help] [--cfg file]\n";
-    exit($_[0]);
-}
-
-sub version {
-    print "Reply version $Reply::VERSION\n";
-    exit(0);
-}
-
-__DATA__
-script_line1 = use strict
-script_line2 = use warnings
-script_line3 = use 5.XXX
-
-[Interrupt]
-[FancyPrompt]
-[DataDumper]
-[Colors]
-[ReadLine]
-[Hints]
-[Packages]
-[LexicalPersistence]
-[ResultCache]
+exit(Reply::App->new->run(@ARGV));
