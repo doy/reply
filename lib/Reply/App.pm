@@ -80,24 +80,28 @@ sub run {
     return 0;
 }
 
-=method usage
+=method usage($exitcode)
 
-Prints usage information to the screen.
+Prints usage information to the screen. If C<$exitcode> is 0, it will be
+printed to C<STDOUT>, otherwise it will be printed to C<STDERR>.
 
 =cut
 
 sub usage {
-    print "    reply [--version] [--help] [--cfg file]\n";
+    my $fh = $_[0] ? *STDERR : *STDOUT;
+    print $fh "    reply [--version] [--help] [--cfg file]\n";
 }
 
-=method version
+=method version($exitcode)
 
-Prints version information to the screen.
+Prints version information to the screen. If C<$exitcode> is 0, it will be
+printed to C<STDOUT>, otherwise it will be printed to C<STDERR>.
 
 =cut
 
 sub version {
-    print "Reply version $Reply::VERSION\n";
+    my $fh = $_[0] ? *STDERR : *STDOUT;
+    print $fh "Reply version $Reply::VERSION\n";
 }
 
 1;
