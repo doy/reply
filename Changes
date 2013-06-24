@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.10  2013-06-24
       - don't pollute main::, since that's where the default configuration
         drops the user (reported by miyagawa)
 
