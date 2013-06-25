@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.12  2013-06-25
       - make the AutoRefresh plugin use the new track_require functionality
         in Class::Refresh (fixes a problem reported by Michael Reddick)
 
