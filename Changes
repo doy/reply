@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.16  2013-06-26
       - bump the Getopt::Long dep, for installing on older perls
 
 0.15  2013-06-26
