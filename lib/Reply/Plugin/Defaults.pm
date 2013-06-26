@@ -39,7 +39,7 @@ sub compile {
 
     my @envs = (
         ($args{environment} ? ($args{environment}) : ()),
-        values %{ $args{environments} },
+        values %{ delete $args{environments} },
     );
 
     if (@envs) {
