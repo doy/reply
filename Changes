@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - bump the Getopt::Long dep, for installing on older perls
 
 0.15  2013-06-26
       - add default command of #q for exiting the repl
