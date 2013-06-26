@@ -3,7 +3,7 @@ use strict;
 use warnings;
 # ABSTRACT: command line app runner for Reply
 
-use Getopt::Long 'GetOptionsFromArray';
+use Getopt::Long 2.36 'GetOptionsFromArray';
 
 use Reply;
 use Reply::Config;
