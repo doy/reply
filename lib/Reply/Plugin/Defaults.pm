@@ -103,4 +103,13 @@ sub loop {
     return $continue;
 }
 
+=begin Pod::Coverage
+
+  new
+  command_q
+
+=end Pod::Coverage
+
+=cut
+
 1;
