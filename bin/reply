@@ -8,7 +8,7 @@ use Reply::App;
 
 =head1 SYNOPSIS
 
-  reply
+  reply [-lb] [-I dir] [-M mod] [--version] [--help] [--cfg file]
 
 =head1 DESCRIPTION
 
@@ -18,6 +18,45 @@ you if that file does not exist.
 
 See the L<Reply> documentation for more information about using and configuring
 this program.
+
+=head1 OPTIONS
+
+reply takes these command line options:
+
+=over 4
+
+=item -I lib
+
+Adds the given directory to C<@INC>.
+
+=item -l
+
+Equivalent to C<-I lib>.
+
+=item -b
+
+Equivalent to C<-I blib/lib -I blib/arch>.
+
+=item -M Carp::Always
+
+Loads the specified module before starting the repl. It is loaded within the
+repl, so things like exporting work properly.
+
+=item --cfg ~/.replyrc
+
+Specifies a different configuration file to use. C<~/.replyrc> is the default.
+
+=item --version
+
+Displays the program version.
+
+=item --help
+
+Displays usage information.
+
+=item
+
+=back
 
 =cut
 
