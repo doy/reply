@@ -26,7 +26,6 @@ sub read_line {
 }
 
 (my $PREFIX = <<'PREFIX') =~ s/__PACKAGE__/__PACKAGE__/ge;
-package main;
 BEGIN {
     $^H = $__PACKAGE__::default_hints;
     %^H = %$__PACKAGE__::default_hinthash;
@@ -47,8 +46,11 @@ sub compile {
         $args{environment} = { map { %$_ } @envs }
     }
 
+    my $package = delete $args{package} || 'main';
+    my $prefix = "package $package;\n$PREFIX";
+
     return eval_closure(
-        source      => "sub {\n$PREFIX;\n$line\n}",
+        source      => "sub {\n$prefix;\n$line\n}",
         terse_error => 1,
         %args,
     );

@@ -36,7 +36,6 @@ sub mangle_line {
 
     my $package = __PACKAGE__;
     return <<LINE;
-package $self->{package};
 $line
 ;
 BEGIN {
@@ -47,16 +46,16 @@ LINE
 
 sub compile {
     my $self = shift;
-    my ($next, @args) = @_;
+    my ($next, $line, %args) = @_;
+
+    $args{package} = $self->{package};
+
+    my @result = $next->($line, %args);
 
     # XXX it'd be nice to avoid using globals here, but we can't use
     # eval_closure's environment parameter since we need to access the
     # information in a BEGIN block
-    our $package = $self->{package};
-
-    my @result = $next->(@args);
-
-    $self->{package} = $package;
+    $self->{package} = our $package;
 
     return @result;
 }
