@@ -76,7 +76,24 @@ string and returns the modified line.
 Compiles the string of Perl code into a coderef. Takes the line of code as a
 string and a hash of extra parameters, and returns the coderef to be executed.
 The default implementation uses L<Eval::Closure> to compile the given string.
-The extra parameters are passed directly to the C<eval_closure> call.
+
+The extra parameters can be anything that C<eval_closure> supports, as well as
+these additional parameters:
+
+=over 4
+
+=item package
+
+The package to use to evaluate the code within. Defaults to C<main>.
+
+=item environments
+
+A hashref of additional lexical environments to be merged with the main lexical
+environment in the C<environment> key. This allows plugins to ensure that their
+extra additions to the lexical scope remain visible, even if other plugins
+change what "the current lexical scope" means.
+
+=back
 
 =item execute
 
