@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - add default command of #q for exiting the repl
 
 0.14  2013-06-26
       - add -l, -b, -I, and -M options (requested by Toby Inkster, RT86341)
