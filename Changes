@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - allow plugins to configure the current package to use through the
+        'package' parameter in the compile callback
 
 0.12  2013-06-25
       - make the AutoRefresh plugin use the new track_require functionality
