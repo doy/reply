@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - add -l, -b, -I, and -M options (requested by Toby Inkster, RT86341)
 
 0.13  2013-06-26
       - allow plugins to configure the current package to use through the
