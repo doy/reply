@@ -38,11 +38,18 @@ sub run {
     my $self = shift;
     my @argv = @_;
 
+    Getopt::Long::Configure("gnu_getopt");
+
     my $cfgfile = '.replyrc';
     my $exitcode;
+    my @modules;
     my $parsed = GetOptionsFromArray(
         \@argv,
         'cfg:s'   => \$cfgfile,
+        'l|lib'   => sub { push @INC, 'lib' },
+        'b|blib'  => sub { push @INC, 'blib/lib', 'blib/arch' },
+        'I:s@'    => sub { push @INC, $_[1] },
+        'M:s@'    => \@modules,
         'version' => sub { $exitcode = 0; version() },
         'help'    => sub { $exitcode = 0; usage() },
     );
@@ -75,7 +82,9 @@ sub run {
         }
     }
 
-    Reply->new(%args)->run;
+    my $reply = Reply->new(%args);
+    $reply->step("use $_") for @modules;
+    $reply->run;
 
     return 0;
 }
@@ -89,7 +98,7 @@ printed to C<STDOUT>, otherwise it will be printed to C<STDERR>.
 
 sub usage {
     my $fh = $_[0] ? *STDERR : *STDOUT;
-    print $fh "    reply [--version] [--help] [--cfg file]\n";
+    print $fh "    reply [-lb] [-I dir] [-M mod] [--version] [--help] [--cfg file]\n";
 }
 
 =method version($exitcode)
