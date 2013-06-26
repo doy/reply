@@ -142,7 +142,9 @@ sub step {
     catch {
         $self->_print_error($_);
     };
-    $self->_loop;
+
+    my ($continue) = $self->_loop;
+    return $continue;
 }
 
 sub _load_config {
