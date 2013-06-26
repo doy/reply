@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.13  2013-06-26
       - allow plugins to configure the current package to use through the
         'package' parameter in the compile callback
 
