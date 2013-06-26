@@ -102,7 +102,8 @@ sub new {
 =method run
 
 Runs the repl. Will continue looping until the C<read_line> callback returns
-undef or the C<loop> callback returns false.
+undef (typically when the user presses C<Ctrl+D>), or the C<loop> callback
+returns false (by default, the C<#q> command quits the repl in this way).
 
 =cut
 
