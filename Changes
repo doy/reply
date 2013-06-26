@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.15  2013-06-26
       - add default command of #q for exiting the repl
 
 0.14  2013-06-26
