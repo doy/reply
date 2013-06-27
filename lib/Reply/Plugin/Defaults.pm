@@ -118,6 +118,7 @@ sub loop {
 
   new
   command_q
+  lexical_environment
 
 =end Pod::Coverage
 

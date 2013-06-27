@@ -74,6 +74,7 @@ sub tab_handler {
 
 =for Pod::Coverage
   tab_handler
+  lexical_environment
 
 =cut
 
