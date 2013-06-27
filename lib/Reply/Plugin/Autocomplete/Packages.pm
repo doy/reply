@@ -25,7 +25,7 @@ sub tab_handler {
     my ($line) = @_;
 
     # $module_name_rx does not permit trailing ::
-    my ($package_fragment) = $line =~ /($module_name_rx(?:::)?)$/;
+    my ($package_fragment) = $line =~ /(${module_name_rx}:?:?)$/;
     return unless $package_fragment;
 
     my $file_fragment = $package_fragment;
