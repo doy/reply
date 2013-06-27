@@ -4,7 +4,7 @@ use warnings;
 # ABSTRACT: read, eval, print, loop, yay!
 
 use Module::Runtime qw(compose_module_name require_module);
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed weaken);
 use Try::Tiny;
 
 use Reply::Config;
@@ -188,7 +188,14 @@ sub _load_plugin {
         require_module($plugin);
         die "$plugin is not a valid plugin"
             unless $plugin->isa("Reply::Plugin");
-        $plugin = $plugin->new(%$opts);
+
+        my $weakself = $self;
+        weaken($weakself);
+
+        $plugin = $plugin->new(
+            %$opts,
+            tab_handler => sub { $weakself->_tab_handler(@_) },
+        );
     }
 
     push @{ $self->{plugins} }, $plugin;
@@ -252,6 +259,12 @@ sub _loop {
     my $self = shift;
 
     $self->_chained_plugin('loop', 1);
+}
+
+sub _tab_handler {
+    my $self = shift;
+
+    $self->_concatenate_plugin('tab_handler', @_);
 }
 
 sub _wrapped_plugin {
