@@ -6,6 +6,7 @@ use warnings;
 use base 'Reply::Plugin';
 
 use B::Keywords qw/@Functions @Barewords/;
+use Module::Runtime '$module_name_rx';
 
 =head1 SYNOPSIS
 
@@ -23,6 +24,7 @@ sub tab_handler {
 
     return (
         $self->_tab_keyword($line),
+        $self->_tab_package_loaded($line),
     );
 }
 
@@ -35,6 +37,30 @@ sub _tab_keyword {
     my $re = qr/^\Q$last_word/;
 
     return grep { $_ =~ $re } @Functions, @Barewords;
+}
+
+sub _tab_package_loaded {
+    my ($self, $line) = @_;
+
+    # $module_name_rx does not permit trailing ::
+    my ($package_fragment) = $line =~ /($module_name_rx(?:::)?)$/;
+    return unless $package_fragment;
+
+    my $file_fragment = $package_fragment;
+    $file_fragment =~ s{::}{/}g;
+
+    my $re = qr/^\Q$file_fragment/;
+
+    my @results;
+    for my $inc (keys %INC) {
+        if ($inc =~ $re) {
+            $inc =~ s{/}{::}g;
+            $inc =~ s{\.pm$}{};
+            push @results, $inc;
+        }
+    }
+
+    return @results;
 }
 
 1;
