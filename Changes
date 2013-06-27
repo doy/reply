@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - support color on windows (aero)
 
 0.16  2013-06-26
       - bump the Getopt::Long dep, for installing on older perls

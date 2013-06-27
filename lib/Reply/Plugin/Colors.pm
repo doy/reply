@@ -6,6 +6,12 @@ use warnings;
 use base 'Reply::Plugin';
 
 use Term::ANSIColor;
+BEGIN {
+    if ($^O eq 'MSWin32') {
+        require Win32::Console::ANSI;
+        Win32::Console::ANSI->import;
+    }
+}
 
 =head1 SYNOPSIS
 
