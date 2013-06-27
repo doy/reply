@@ -72,10 +72,4 @@ sub tab_handler {
     return @results;
 }
 
-=for Pod::Coverage
-  tab_handler
-  lexical_environment
-
-=cut
-
 1;

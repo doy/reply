@@ -32,9 +32,4 @@ sub tab_handler {
     return grep { $_ =~ $re } @Functions, @Barewords;
 }
 
-=for Pod::Coverage
-  tab_handler
-
-=cut
-
 1;

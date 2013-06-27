@@ -46,9 +46,4 @@ sub tab_handler {
     return @results;
 }
 
-=for Pod::Coverage
-  tab_handler
-
-=cut
-
 1;
