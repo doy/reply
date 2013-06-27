@@ -23,8 +23,9 @@ sub tab_handler {
     my $self = shift;
     my ($line) = @_;
 
-    my ($last_word) = $line =~ /(\w+)$/;
+    my ($before, $last_word) = $line =~ /(.*?)(\w+)$/;
     return unless $last_word;
+    return if $before =~ /[\$\@\%\&\*]\s*$/;
 
     my $re = qr/^\Q$last_word/;
 
