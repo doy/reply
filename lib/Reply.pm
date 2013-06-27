@@ -194,7 +194,7 @@ sub _load_plugin {
 
         $plugin = $plugin->new(
             %$opts,
-            tab_handler => sub { $weakself->_tab_handler(@_) },
+            publisher => sub { $weakself->_publish(@_) },
         );
     }
 
@@ -261,10 +261,10 @@ sub _loop {
     $self->_chained_plugin('loop', 1);
 }
 
-sub _tab_handler {
+sub _publish {
     my $self = shift;
 
-    $self->_concatenate_plugin('tab_handler', @_);
+    $self->_concatenate_plugin(@_);
 }
 
 sub _wrapped_plugin {

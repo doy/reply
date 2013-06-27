@@ -37,7 +37,7 @@ sub new {
 
     my $self = $class->SUPER::new(@_);
     $self->{term} = Term::ReadLine->new('Reply');
-    $self->{tab_handler} = $opts{tab_handler};
+    $self->{publisher} = $opts{publisher};
     my $history = $opts{history_file} || '.reply_history';
     $self->{history_file} = File::Spec->catfile(
         (File::Spec->file_name_is_absolute($history)
@@ -91,7 +91,7 @@ sub _register_tab_complete {
     my $self = shift;
 
     my $term = $self->{term};
-    my $completion_handler = $self->{tab_handler};
+    my $publisher = $self->{publisher};
 
     if ($term->ReadLine eq 'Term::ReadLine::Gnu') {
         $term->Attribs->{attempted_completion_function} = sub {
@@ -100,7 +100,7 @@ sub _register_tab_complete {
             # discard everything after the cursor for completion purposes
             substr($line, $end) = '';
 
-            my @matches = $completion_handler->($line);
+            my @matches = $publisher->('tab_handler', $line);
             my $match_index = 0;
 
             return $term->completion_matches($text, sub {
