@@ -26,6 +26,9 @@ sub new {
 
     my $self = $class->SUPER::new(@_);
     $self->{package} = $opts{default_package} || 'main';
+    $self->{publisher} = $opts{publisher};
+
+    $self->{publisher}->(package => $self->{package});
 
     return $self;
 }
@@ -48,14 +51,13 @@ sub compile {
     my $self = shift;
     my ($next, $line, %args) = @_;
 
-    $args{package} = $self->{package};
-
     my @result = $next->($line, %args);
 
     # XXX it'd be nice to avoid using globals here, but we can't use
     # eval_closure's environment parameter since we need to access the
     # information in a BEGIN block
     $self->{package} = our $package;
+    $self->{publisher}->(package => $self->{package});
 
     return @result;
 }

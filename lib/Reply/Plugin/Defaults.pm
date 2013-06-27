@@ -21,6 +21,7 @@ sub new {
     my $self = $class->SUPER::new(@_);
     $self->{quit} = 0;
     $self->{env} = {};
+    $self->{package} = 'main';
 
     return $self;
 }
@@ -53,8 +54,7 @@ sub compile {
         %$default_env,
     };
 
-    my $package = delete $args{package} || 'main';
-    my $prefix = "package $package;\n$PREFIX";
+    my $prefix = "package $self->{package};\n$PREFIX";
 
     return eval_closure(
         source      => "sub {\n$prefix;\n$line\n}",
@@ -68,6 +68,12 @@ sub lexical_environment {
     my $self = shift;
     my ($name, $env) = @_;
     $self->{env}{$name} = $env;
+}
+
+sub package {
+    my $self = shift;
+    my ($package) = @_;
+    $self->{package} = $package;
 }
 
 sub execute {
