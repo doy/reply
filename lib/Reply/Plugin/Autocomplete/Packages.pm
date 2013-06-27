@@ -1,46 +1,28 @@
-package Reply::Plugin::Autocomplete;
+package Reply::Plugin::Autocomplete::Packages;
 use strict;
 use warnings;
-# ABSTRACT: tab complete your input
+# ABSTRACT: tab completion for package names
 
 use base 'Reply::Plugin';
 
-use B::Keywords qw/@Functions @Barewords/;
 use Module::Runtime '$module_name_rx';
 
 =head1 SYNOPSIS
 
   ; .replyrc
-  [Autocomplete]
+  [ReadLine]
+  [Autocomplete::Packages]
 
 =head1 DESCRIPTION
 
-This plugin registers a tab key handler to autocomplete Perl code.
+This plugin registers a tab key handler to autocomplete package names in Perl
+code.
 
 =cut
 
 sub tab_handler {
-    my ($self, $line) = @_;
-
-    return (
-        $self->_tab_keyword($line),
-        $self->_tab_package_loaded($line),
-    );
-}
-
-sub _tab_keyword {
-    my ($self, $line) = @_;
-
-    my ($last_word) = $line =~ /(\w+)$/;
-    return unless $last_word;
-
-    my $re = qr/^\Q$last_word/;
-
-    return grep { $_ =~ $re } @Functions, @Barewords;
-}
-
-sub _tab_package_loaded {
-    my ($self, $line) = @_;
+    my $self = shift;
+    my ($line) = @_;
 
     # $module_name_rx does not permit trailing ::
     my ($package_fragment) = $line =~ /($module_name_rx(?:::)?)$/;
