@@ -7,6 +7,7 @@ use base 'Reply::Plugin';
 
 use File::HomeDir;
 use File::Spec;
+use Scalar::Util 'weaken';
 use Term::ReadLine;
 
 =head1 SYNOPSIS
@@ -37,7 +38,6 @@ sub new {
 
     my $self = $class->SUPER::new(@_);
     $self->{term} = Term::ReadLine->new('Reply');
-    $self->{publisher} = $opts{publisher};
     my $history = $opts{history_file} || '.reply_history';
     $self->{history_file} = File::Spec->catfile(
         (File::Spec->file_name_is_absolute($history)
@@ -91,7 +91,8 @@ sub _register_tab_complete {
     my $self = shift;
 
     my $term = $self->{term};
-    my $publisher = $self->{publisher};
+
+    weaken(my $weakself = $self);
 
     if ($term->ReadLine eq 'Term::ReadLine::Gnu') {
         $term->Attribs->{attempted_completion_function} = sub {
@@ -100,7 +101,7 @@ sub _register_tab_complete {
             # discard everything after the cursor for completion purposes
             substr($line, $end) = '';
 
-            my @matches = $publisher->('tab_handler', $line);
+            my @matches = $weakself->publish('tab_handler', $line);
             my $match_index = 0;
 
             return $term->completion_matches($text, sub {

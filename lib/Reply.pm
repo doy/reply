@@ -81,11 +81,10 @@ sub new {
     my $class = shift;
     my %opts = @_;
 
-    require Reply::Plugin::Defaults;
-    my $self = bless {
-        plugins         => [],
-        _default_plugin => Reply::Plugin::Defaults->new,
-    }, $class;
+    my $self = bless {}, $class;
+
+    $self->{plugins} = [];
+    $self->{_default_plugin} = $self->_instantiate_plugin('Defaults');
 
     if (defined $opts{config}) {
         if (!ref($opts{config})) {
@@ -183,6 +182,15 @@ sub _load_plugin {
     my $self = shift;
     my ($plugin, $opts) = @_;
 
+    $plugin = $self->_instantiate_plugin($plugin, $opts);
+
+    push @{ $self->{plugins} }, $plugin;
+}
+
+sub _instantiate_plugin {
+    my $self = shift;
+    my ($plugin, $opts) = @_;
+
     if (!blessed($plugin)) {
         $plugin = compose_module_name("Reply::Plugin", $plugin);
         require_module($plugin);
@@ -198,7 +206,7 @@ sub _load_plugin {
         );
     }
 
-    push @{ $self->{plugins} }, $plugin;
+    return $plugin;
 }
 
 sub _plugins {

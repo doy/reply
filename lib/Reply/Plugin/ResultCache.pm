@@ -28,7 +28,6 @@ sub new {
     my $self = $class->SUPER::new(@_);
     $self->{results} = [];
     $self->{result_name} = $opts{variable} || 'res';
-    $self->{publisher} = $opts{publisher};
 
     return $self;
 }
@@ -45,7 +44,7 @@ sub execute {
         push @{ $self->{results} }, \@res;
     }
 
-    $self->{publisher}->(
+    $self->publish(
         'lexical_environment',
         result_cache => {
             "\@$self->{result_name}" => $self->{results},

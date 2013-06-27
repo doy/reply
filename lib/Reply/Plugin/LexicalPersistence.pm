@@ -26,7 +26,6 @@ sub new {
 
     my $self = $class->SUPER::new(@_);
     $self->{env} = {};
-    $self->{publisher} = $opts{publisher};
 
     return $self;
 }
@@ -42,7 +41,7 @@ sub compile {
         %{ peek_sub($code) },
     };
 
-    $self->{publisher}->('lexical_environment', default => $self->{env});
+    $self->publish('lexical_environment', default => $self->{env});
 
     return $code;
 }

@@ -137,7 +137,22 @@ should terminate.
 
 =cut
 
-sub new { bless {}, shift }
+sub new {
+    my $class = shift;
+    my (%opts) = @_;
+
+    die "publisher is required" unless $opts{publisher};
+
+    return bless {
+        publisher => $opts{publisher},
+    }, $class;
+}
+
+sub publish {
+    my $self = shift;
+
+    $self->{publisher}->(@_);
+}
 
 =for Pod::Coverage
   new
