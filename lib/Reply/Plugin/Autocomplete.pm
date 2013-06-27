@@ -63,4 +63,9 @@ sub _tab_package_loaded {
     return @results;
 }
 
+=for Pod::Coverage
+  tab_handler
+
+=cut
+
 1;
