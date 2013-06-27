@@ -283,6 +283,22 @@ sub _chained_plugin {
     return @args;
 }
 
+sub _concatenate_plugin {
+    my $self = shift;
+    my @plugins = ref($_[0]) ? @{ shift() } : $self->_plugins;
+    my ($method, @args) = @_;
+
+    @plugins = grep { $_->can($method) } @plugins;
+
+    my @results;
+
+    for my $plugin (@plugins) {
+        push @results, $plugin->$method(@args);
+    }
+
+    return @results;
+}
+
 =head1 BUGS
 
 No known bugs.
