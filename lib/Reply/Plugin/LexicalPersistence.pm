@@ -22,8 +22,12 @@ then use C<$x> as expected in subsequent lines.
 
 sub new {
     my $class = shift;
+    my %opts = @_;
+
     my $self = $class->SUPER::new(@_);
     $self->{env} = {};
+    $self->{publisher} = $opts{publisher};
+
     return $self;
 }
 
@@ -31,18 +35,14 @@ sub compile {
     my $self = shift;
     my ($next, $line, %args) = @_;
 
-    $args{environment} ||= {};
-    $args{environment} = {
-        %{ $args{environment} },
-        %{ $self->{env} },
-    };
-
     my ($code) = $next->($line, %args);
 
     $self->{env} = {
         %{ $self->{env} },
         %{ peek_sub($code) },
     };
+
+    $self->{publisher}->('lexical_environment', default => $self->{env});
 
     return $code;
 }

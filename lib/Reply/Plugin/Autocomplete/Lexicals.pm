@@ -32,25 +32,11 @@ sub new {
     return $self;
 }
 
-sub compile {
+sub lexical_environment {
     my $self = shift;
-    my ($next, @args) = @_;
+    my ($name, $env) = @_;
 
-    my ($code) = $next->(@args);
-
-    # XXX this is just copied from LexicalPersistence, which sucks first
-    # because of copying and pasting code, and second because it doesn't catch
-    # anything that wouldn't be caught by LexicalPersistence (setting lexicals
-    # via Devel::StackTrace::WithLexicals (Carp::Reply), setting extra lexicals
-    # (ResultCache))
-    # we really need a way to broadcast various bits of information among
-    # plugins
-    $self->{env} = {
-        %{ $self->{env} },
-        %{ peek_sub($code) },
-    };
-
-    return $code;
+    $self->{env}{$name} = $env;
 }
 
 sub tab_handler {
@@ -62,8 +48,11 @@ sub tab_handler {
 
     my ($sigil, $name_prefix) = $var =~ /(.)(.*)/;
 
+    my $env = { map { %$_ } values %{ $self->{env} } };
+    my @env = keys %$env;
+
     my @results;
-    for my $env_var (keys %{ $self->{env} }) {
+    for my $env_var (@env) {
         my ($env_sigil, $env_name) = $env_var =~ /(.)(.*)/;
 
         next unless index($env_name, $name_prefix) == 0;

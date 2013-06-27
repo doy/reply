@@ -28,19 +28,9 @@ sub new {
     my $self = $class->SUPER::new(@_);
     $self->{results} = [];
     $self->{result_name} = $opts{variable} || 'res';
+    $self->{publisher} = $opts{publisher};
 
     return $self;
-}
-
-sub compile {
-    my $self = shift;
-    my ($next, $line, %args) = @_;
-
-    $args{environments}{''.__PACKAGE__} = {
-        "\@$self->{result_name}" => $self->{results},
-    };
-
-    $next->($line, %args);
 }
 
 sub execute {
@@ -54,6 +44,13 @@ sub execute {
     elsif (@res > 1) {
         push @{ $self->{results} }, \@res;
     }
+
+    $self->{publisher}->(
+        'lexical_environment',
+        result_cache => {
+            "\@$self->{result_name}" => $self->{results},
+        },
+    );
 
     return @res;
 }

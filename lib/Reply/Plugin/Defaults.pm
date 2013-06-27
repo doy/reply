@@ -20,6 +20,7 @@ sub new {
 
     my $self = $class->SUPER::new(@_);
     $self->{quit} = 0;
+    $self->{env} = {};
 
     return $self;
 }
@@ -46,14 +47,11 @@ sub compile {
     my $self = shift;
     my ($next, $line, %args) = @_;
 
-    my @envs = (
-        ($args{environment} ? ($args{environment}) : ()),
-        values %{ delete $args{environments} },
-    );
-
-    if (@envs) {
-        $args{environment} = { map { %$_ } @envs }
-    }
+    my $default_env = delete $self->{env}{default} || {};
+    my $env = {
+        (map { %$_ } values %{ $self->{env} }),
+        %$default_env,
+    };
 
     my $package = delete $args{package} || 'main';
     my $prefix = "package $package;\n$PREFIX";
@@ -61,8 +59,15 @@ sub compile {
     return eval_closure(
         source      => "sub {\n$prefix;\n$line\n}",
         terse_error => 1,
+        environment => $env,
         %args,
     );
+}
+
+sub lexical_environment {
+    my $self = shift;
+    my ($name, $env) = @_;
+    $self->{env}{$name} = $env;
 }
 
 sub execute {
