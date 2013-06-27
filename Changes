@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.17  2013-06-27
       - support color on windows (aero)
 
 0.16  2013-06-26
