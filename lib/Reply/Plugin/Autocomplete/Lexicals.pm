@@ -19,7 +19,7 @@ Perl code.
 =cut
 
 # XXX unicode?
-my $var_name_rx = qr/[\$\@\%]([A-Z_a-z][0-9A-Z_a-z]*)?/;
+my $var_name_rx = qr/[\$\@\%]\s*(?:[A-Z_a-z][0-9A-Z_a-z]*)?/;
 
 sub new {
     my $class = shift;
