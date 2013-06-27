@@ -37,6 +37,7 @@ sub new {
 
     my $self = $class->SUPER::new(@_);
     $self->{term} = Term::ReadLine->new('Reply');
+    $self->{tab_handler} = $opts{tab_handler};
     my $history = $opts{history_file} || '.reply_history';
     $self->{history_file} = File::Spec->catfile(
         (File::Spec->file_name_is_absolute($history)
@@ -62,6 +63,8 @@ sub new {
             if -e $self->{history_file};
     }
 
+    $self->_register_tab_complete;
+
     return $self;
 }
 
@@ -82,6 +85,25 @@ sub DESTROY {
 
     $self->{term}->WriteHistory($self->{history_file})
         or warn "Couldn't write history to $self->{history_file}";
+}
+
+sub _register_tab_complete {
+    my $self = shift;
+
+    my $completion_handler = $self->{tab_handler};
+
+    if ($self->{term}->ReadLine eq 'Term::ReadLine::Gnu') {
+        $self->{term}->Attribs->{attempted_completion_function} = sub {
+            my ($text, $line, $start, $end) = @_;
+
+            # discard everything after the cursor for completion purposes
+            substr($line, $end) = '';
+
+            my @matches = $completion_handler->($line);
+
+            return @matches;
+        };
+    }
 }
 
 1;
