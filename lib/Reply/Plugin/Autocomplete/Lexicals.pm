@@ -5,8 +5,6 @@ use warnings;
 
 use base 'Reply::Plugin';
 
-use PadWalker 'peek_sub';
-
 =head1 SYNOPSIS
 
   ; .replyrc
