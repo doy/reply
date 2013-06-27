@@ -90,18 +90,23 @@ sub DESTROY {
 sub _register_tab_complete {
     my $self = shift;
 
+    my $term = $self->{term};
     my $completion_handler = $self->{tab_handler};
 
-    if ($self->{term}->ReadLine eq 'Term::ReadLine::Gnu') {
-        $self->{term}->Attribs->{attempted_completion_function} = sub {
+    if ($term->ReadLine eq 'Term::ReadLine::Gnu') {
+        $term->Attribs->{attempted_completion_function} = sub {
             my ($text, $line, $start, $end) = @_;
 
             # discard everything after the cursor for completion purposes
             substr($line, $end) = '';
 
             my @matches = $completion_handler->($line);
+            my $match_index = 0;
 
-            return @matches;
+            return $term->completion_matches($text, sub {
+                my ($text, $index) = @_;
+                return $matches[$index];
+            });
         };
     }
 }
