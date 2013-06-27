@@ -57,8 +57,9 @@ sub tab_handler {
 
         next unless index($env_name, $name_prefix) == 0;
 
+        # this is weird, not sure why % gets stripped but not $ or @
         if ($sigil eq $env_sigil) {
-            push @results, $env_name;
+            push @results, $sigil eq '%' ? $env_var : $env_name;
         }
         elsif ($env_sigil eq '@' && $sigil eq '$') {
             push @results, "$env_name\[";
