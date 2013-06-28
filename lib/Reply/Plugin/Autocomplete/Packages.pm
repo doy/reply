@@ -43,7 +43,19 @@ sub tab_handler {
         }
     }
 
+    push @results,
+        grep m/^\Q$package_fragment/,
+        @{$self->{moar_packages}||=[]};
+
     return @results;
+}
+
+# listen for events from the Packages plugin, for its wise wisdom
+# can teach us about packages that are not in %INC
+sub package {
+    my $self = shift;
+    my ($pkg) = @_;
+    push @{$self->{moar_packages}||=[]}, $pkg;
 }
 
 1;
