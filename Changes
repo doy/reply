@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.19  2013-06-28
       - fix test failures (reported by brunobuss)
 
 0.18  2013-06-27
