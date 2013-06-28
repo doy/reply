@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - completion for packages declared in the repl (Toby Inkster, gh-#7)
+      - completion for functions (Toby Inkster, gh-#8)
 
 0.19  2013-06-28
       - fix test failures (reported by brunobuss)
