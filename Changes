@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - fix test failures (reported by brunobuss)
 
 0.18  2013-06-27
       - tab completion support (with help from sartak)
