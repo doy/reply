@@ -28,14 +28,20 @@ sub tab_handler {
     my ($before, $fragment) = $line =~ /(.*?)(${module_name_rx}(::)?)$/;
     return unless $fragment;
 
-    my ($package, $func) = ($fragment =~ /^(.+:)(\w+)$/);
-    $func = '' unless defined $func;
-    $package = $self->{'package'} unless $package;
-    $package =~ s/::$//;
+    my ($package, $func);
+    if ($fragment =~ /:/) {
+        ($package, $func) = ($fragment =~ /^(.+:)(\w*)$/);
+        $func = '' unless defined $func;
+        $package =~ s/:{1,2}$//;
+    }
+    else {
+        $package = $self->{'package'};
+        $func = $fragment;
+    }
 
     return
         map  { $package eq $self->{'package'} ? $_ : "$package\::$_" }
-        grep { /^\Q$func/ }
+        grep { $func ? /^\Q$func/ : 1 }
         'Package::Stash'->new($package)->list_all_symbols('CODE');
 }
 
