@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.18  2013-06-27
       - tab completion support (with help from sartak)
       - lots of internal refactorings to make writing plugins easier
 
