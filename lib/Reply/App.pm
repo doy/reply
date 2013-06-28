@@ -130,3 +130,4 @@ script_line3 = use 5.XXX
 [LexicalPersistence]
 [ResultCache]
 [Autocomplete::Packages]
+[Autocomplete::Lexicals]
