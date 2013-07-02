@@ -40,9 +40,10 @@ sub tab_handler {
 
     my @parts = split '::', $rest, -1;
     return if grep { /:/ } @parts;
-    return if $parts[0] =~ /^[0-9]/;
+    return if @parts && $parts[0] =~ /^[0-9]/;
 
     my $var_prefix = pop @parts;
+    $var_prefix = '' unless defined $var_prefix;
 
     my $stash_name = join('::', @parts);
     my $stash = eval {
