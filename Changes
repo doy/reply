@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - check inheritance in method completions
+      - fix a couple more completion edge cases
 
 0.20  2013-06-28
       - completion for packages declared in the repl (Toby Inkster, gh-#7)
