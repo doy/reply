@@ -69,8 +69,13 @@ sub tab_handler {
         $class = $invocant;
     }
 
+    my @mro = (
+        @{ mro::get_linear_isa('UNIVERSAL') },
+        @{ mro::get_linear_isa($class) },
+    );
+
     my @results;
-    for my $package (@{ mro::get_linear_isa($class) }) {
+    for my $package (@mro) {
         my $stash = eval { Package::Stash->new($package) };
         next unless $stash;
 
