@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - few more completion edge cases
 
 0.21  2013-07-01
       - check inheritance in method completions
