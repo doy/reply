@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.21  2013-07-01
       - check inheritance in method completions
       - fix a couple more completion edge cases
 
