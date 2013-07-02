@@ -50,7 +50,9 @@ sub tab_handler {
     my ($line) = @_;
 
     my ($invocant, $method) = $line =~ /((?:\$\s*)?[A-Z_a-z][0-9A-Z_a-z:]*)->([A-Z_a-z][0-9A-Z_a-z]*)?$/;
-    return unless $method;
+    return unless $invocant;
+
+    $method = '' unless defined $method;
 
     my $package;
     if ($invocant =~ /^\$/) {
