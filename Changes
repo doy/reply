@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.24  2013-07-04
       - use Devel::LexAlias to ensure that the lexical environment is persisted
         properly (gh #10)
       - a few internal refactorings
