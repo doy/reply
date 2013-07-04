@@ -24,16 +24,16 @@ sub new {
     my $class = shift;
 
     my $self = $class->SUPER::new(@_);
-    $self->{env} = {};
+    $self->{env} = [];
 
     return $self;
 }
 
 sub lexical_environment {
     my $self = shift;
-    my ($name, $env) = @_;
+    my ($env) = @_;
 
-    $self->{env}{$name} = $env;
+    push @{ $self->{env} }, $env;
 }
 
 sub tab_handler {
@@ -48,7 +48,7 @@ sub tab_handler {
     # these can't be lexicals
     return if $sigil eq '&' || $sigil eq '*';
 
-    my $env = { map { %$_ } values %{ $self->{env} } };
+    my $env = { map { %$_ } @{ $self->{env} } };
     my @env = keys %$env;
 
     my @results;

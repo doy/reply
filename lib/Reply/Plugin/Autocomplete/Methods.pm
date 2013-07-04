@@ -28,7 +28,7 @@ sub new {
     my $class = shift;
 
     my $self = $class->SUPER::new(@_);
-    $self->{env} = {};
+    $self->{env} = [];
     $self->{package} = 'main';
 
     return $self;
@@ -36,9 +36,9 @@ sub new {
 
 sub lexical_environment {
     my $self = shift;
-    my ($name, $env) = @_;
+    my ($env) = @_;
 
-    $self->{env}{$name} = $env;
+    push @{ $self->{env} }, $env;
 }
 
 sub package {
@@ -63,8 +63,7 @@ sub tab_handler {
     if ($invocant =~ /^\$/) {
         # XXX should support globals here
         my $env = {
-            (map { %$_ } values %{ $self->{env} }),
-            (%{ $self->{env}{defaults} || {} }),
+            map { %$_ } @{ $self->{env} },
         };
         my $var = $env->{$invocant};
         return unless $var && ref($var) eq 'REF' && blessed($$var);

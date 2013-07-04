@@ -46,7 +46,7 @@ sub execute {
 
     $self->publish(
         'lexical_environment',
-        result_cache => {
+        {
             "\@$self->{result_name}" => $self->{results},
         },
     );
