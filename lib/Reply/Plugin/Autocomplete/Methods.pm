@@ -61,6 +61,7 @@ sub tab_handler {
 
     my $class;
     if ($invocant =~ /^\$/) {
+        # XXX should support globals here
         my $env = {
             (map { %$_ } values %{ $self->{env} }),
             (%{ $self->{env}{defaults} || {} }),
