@@ -13,6 +13,7 @@ use warnings;
 
 use base 'Reply::Plugin';
 
+use Devel::LexAlias 'lexalias';
 use Eval::Closure;
 
 sub new {
@@ -52,12 +53,18 @@ sub compile {
 
     my $prefix = "package $self->{package};\n$PREFIX";
 
-    return eval_closure(
+    my $code = eval_closure(
         source      => "sub {\n$prefix;\n$line\n}",
         terse_error => 1,
         environment => $env,
         %args,
     );
+
+    for my $name (keys %$env) {
+        lexalias($code, $name, $env->{$name});
+    }
+
+    return $code;
 }
 
 sub lexical_environment {
