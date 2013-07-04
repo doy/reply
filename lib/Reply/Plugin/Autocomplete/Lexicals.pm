@@ -5,6 +5,8 @@ use warnings;
 
 use base 'Reply::Plugin';
 
+use Reply::Util qw($varname_rx);
+
 =head1 SYNOPSIS
 
   ; .replyrc
@@ -17,9 +19,6 @@ This plugin registers a tab key handler to autocomplete lexical variables in
 Perl code.
 
 =cut
-
-# XXX unicode?
-my $var_name_rx = qr/[\$\@\%]\s*(?:[A-Z_a-z][0-9A-Z_a-z]*)?/;
 
 sub new {
     my $class = shift;
@@ -41,10 +40,13 @@ sub tab_handler {
     my $self = shift;
     my ($line) = @_;
 
-    my ($var) = $line =~ /($var_name_rx)$/;
+    my ($var) = $line =~ /($varname_rx)$/;
     return unless $var;
 
     my ($sigil, $name_prefix) = $var =~ /(.)(.*)/;
+
+    # these can't be lexicals
+    return if $sigil eq '&' || $sigil eq '*';
 
     my $env = { map { %$_ } values %{ $self->{env} } };
     my @env = keys %$env;

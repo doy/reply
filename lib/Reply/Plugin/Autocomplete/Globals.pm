@@ -7,6 +7,8 @@ use base 'Reply::Plugin';
 
 use Package::Stash;
 
+use Reply::Util qw($fq_ident_rx $fq_varname_rx);
+
 =head1 SYNOPSIS
 
   ; .replyrc
@@ -32,7 +34,7 @@ sub tab_handler {
     my $self = shift;
     my ($line) = @_;
 
-    my ($maybe_var) = $line =~ /([\$\@\%\&\*]\s*[0-9A-Z_a-z:]*)$/;
+    my ($maybe_var) = $line =~ /($fq_varname_rx)$/;
     return unless $maybe_var;
     $maybe_var =~ s/\s+//g;
 
@@ -90,8 +92,7 @@ sub _recursive_symbols {
         # to not also block out punctuation variables.
         # XXX fix for unicode
         # XXX fix for variables like ${^GLOBAL_PHASE}
-        next unless $name =~ /^[A-Z_a-z][0-9A-Z_a-z]*(?:::)?$/
-                 || length($name) == 1;
+        next unless $name =~ /^$fq_ident_rx(?:::)?$/ || length($name) == 1;
 
         if ($name =~ s/::$//) {
             my $next = Package::Stash->new(join('::', $stash_name, $name));

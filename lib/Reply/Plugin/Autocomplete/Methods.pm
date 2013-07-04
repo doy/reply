@@ -9,6 +9,8 @@ use MRO::Compat;
 use Package::Stash;
 use Scalar::Util 'blessed';
 
+use Reply::Util qw($ident_rx $fq_ident_rx $fq_varname_rx);
+
 =head1 SYNOPSIS
 
   ; .replyrc
@@ -50,8 +52,10 @@ sub tab_handler {
     my $self = shift;
     my ($line) = @_;
 
-    my ($invocant, $method) = $line =~ /((?:\$\s*)?[A-Z_a-z][0-9A-Z_a-z:]*)->([A-Z_a-z][0-9A-Z_a-z]*)?$/;
+    my ($invocant, $method) = $line =~ /($fq_varname_rx|$fq_ident_rx)->($ident_rx)?$/;
     return unless $invocant;
+    # XXX unicode
+    return unless $invocant =~ /^[\$A-Z_a-z]/;
 
     $method = '' unless defined $method;
 
