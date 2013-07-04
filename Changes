@@ -1,6 +1,9 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - use Devel::LexAlias to ensure that the lexical environment is persisted
+        properly (gh #10)
+      - a few internal refactorings
 
 0.23  2013-07-03
       - use the correct #! line (reported by SREZIC, RT86669)
