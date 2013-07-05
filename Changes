@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.25  2013-07-05
       - The DataDump plugin now respects object stringification overloads by
         default. This behavior can be disabled by setting the
         'respect_stringification' option to 0.
