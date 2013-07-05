@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Reply::Plugin';
 
-use Data::Printer alias => 'p';
+use Data::Printer alias => 'p', colored => 1;
 
 =head1 SYNOPSIS
 
