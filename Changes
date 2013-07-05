@@ -1,6 +1,9 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - The DataDump plugin now respects object stringification overloads by
+        default. This behavior can be disabled by setting the
+        'respect_stringification' option to 0.
 
 0.24  2013-07-04
       - use Devel::LexAlias to ensure that the lexical environment is persisted
