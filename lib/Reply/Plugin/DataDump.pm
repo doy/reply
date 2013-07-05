@@ -11,11 +11,15 @@ use overload ();
 =head1 SYNOPSIS
 
   ; .replyrc
-  [DataDumper]
+  [DataDump]
+  respect_stringification = 1
 
 =head1 DESCRIPTION
 
-This plugin uses L<Data::Dump> to format results.
+This plugin uses L<Data::Dump> to format results. By default, if it reaches an
+object which has a stringification overload, it will dump that directly. To
+disable this behavior, set the C<respect_stringification> option to a false
+value.
 
 =cut
 
