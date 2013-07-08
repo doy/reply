@@ -40,7 +40,7 @@ sub mangle_error {
     my @lines = split /\n/, $error;
     if (@lines > $self->{num_lines}) {
         splice @lines, $self->{num_lines};
-        $error = join "\n", @lines, "    (Run #stack to see the full trace)";
+        $error = join "\n", @lines, "    (Run #stack to see the full trace)\n";
     }
 
     return $error;
