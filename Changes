@@ -1,6 +1,9 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - Let Data::Printer handle coloring in the DataPrinter plugin. (Sawyer X)
+      - Add a CollapseStack plugin, to make working with large stack traces
+        easier. (sartak)
 
 0.25  2013-07-05
       - The DataDump plugin now respects object stringification overloads by
