@@ -58,7 +58,7 @@ sub mangle_result {
 
 sub lexical_environment {
     my $self = shift;
-    return { "\@$self->{result_name}" => $self->{results} };
+    return { "\@$self->{result_name}" => [ @{ $self->{results} } ] };
 }
 
 1;
