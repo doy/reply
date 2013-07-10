@@ -5,11 +5,9 @@ use warnings;
 
 use base 'Reply::Plugin';
 
-use MRO::Compat;
-use Package::Stash;
 use Scalar::Util 'blessed';
 
-use Reply::Util qw($ident_rx $fq_ident_rx $fq_varname_rx);
+use Reply::Util qw($ident_rx $fq_ident_rx $fq_varname_rx methods);
 
 =head1 SYNOPSIS
 
@@ -52,12 +50,12 @@ sub tab_handler {
     my $self = shift;
     my ($line) = @_;
 
-    my ($invocant, $method) = $line =~ /($fq_varname_rx|$fq_ident_rx)->($ident_rx)?$/;
+    my ($invocant, $method_prefix) = $line =~ /($fq_varname_rx|$fq_ident_rx)->($ident_rx)?$/;
     return unless $invocant;
     # XXX unicode
     return unless $invocant =~ /^[\$A-Z_a-z]/;
 
-    $method = '' unless defined $method;
+    $method_prefix = '' unless defined $method_prefix;
 
     my $class;
     if ($invocant =~ /^\$/) {
@@ -73,21 +71,9 @@ sub tab_handler {
         $class = $invocant;
     }
 
-    my @mro = (
-        @{ mro::get_linear_isa('UNIVERSAL') },
-        @{ mro::get_linear_isa($class) },
-    );
-
     my @results;
-    for my $package (@mro) {
-        my $stash = eval { Package::Stash->new($package) };
-        next unless $stash;
-
-        for my $stash_method ($stash->list_all_symbols('CODE')) {
-            next unless index($stash_method, $method) == 0;
-
-            push @results, $stash_method;
-        }
+    for my $method (methods($class)) {
+        push @results, $method if index($method, $method_prefix) == 0;
     }
 
     return sort @results;
