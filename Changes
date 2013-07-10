@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - remove accidentally added dep on 'mro', which doesn't exist on 5.8
 
 0.27  2013-07-10
       - Add completion plugin for #-commands (#18)
