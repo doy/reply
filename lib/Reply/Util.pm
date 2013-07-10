@@ -72,4 +72,6 @@ sub all_packages {
 
 =end Pod::Coverage
 
+=cut
+
 1;
