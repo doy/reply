@@ -5,6 +5,11 @@ use warnings;
 
 use base 'Reply::Plugin';
 
+{
+    local @SIG{qw(__DIE__ __WARN__)};
+    require Carp::Always;
+}
+
 =head1 SYNOPSIS
 
   ; .replyrc
@@ -29,6 +34,22 @@ sub new {
     $self->{num_lines} = $opts{num_lines} || 1;
 
     return $self;
+}
+
+sub compile {
+    my $self = shift;
+    my ($next, @args) = @_;
+
+    local $SIG{__DIE__} = \&Carp::Always::_die;
+    $next->(@args);
+}
+
+sub execute {
+    my $self = shift;
+    my ($next, @args) = @_;
+
+    local $SIG{__DIE__} = \&Carp::Always::_die;
+    $next->(@args);
 }
 
 sub mangle_error {
