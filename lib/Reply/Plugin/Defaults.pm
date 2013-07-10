@@ -14,7 +14,7 @@ use warnings;
 use base 'Reply::Plugin';
 
 use Devel::LexAlias 'lexalias';
-use Eval::Closure;
+use Eval::Closure 0.09;
 
 sub new {
     my $class = shift;
