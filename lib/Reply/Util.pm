@@ -11,7 +11,7 @@ our $varcont_rx    = qr/[0-9A-Z_a-z]/;
 our $ident_rx      = qr/${varstart_rx}${varcont_rx}*/;
 our $sigil_rx      = qr/[\$\@\%\&\*]/;
 our $varname_rx    = qr/$sigil_rx\s*$ident_rx/;
-our $fq_ident_rx   = qr/$ident_rx(?:::$varcont_rx+)?/;
-our $fq_varname_rx = qr/$varname_rx(?:::$varcont_rx+)?/;
+our $fq_ident_rx   = qr/$ident_rx(?:::$varcont_rx+)*/;
+our $fq_varname_rx = qr/$varname_rx(?:::$varcont_rx+)*/;
 
 1;
