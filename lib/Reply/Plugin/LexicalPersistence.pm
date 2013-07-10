@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Reply::Plugin';
 
-use PadWalker 'peek_sub';
+use PadWalker 'peek_sub', 'closed_over';
 
 =head1 SYNOPSIS
 
@@ -36,9 +36,12 @@ sub compile {
 
     my ($code) = $next->($line, %args);
 
+    my $new_env = peek_sub($code);
+    delete $new_env->{$_} for keys %{ closed_over($code) };
+
     $self->{env} = {
         %{ $self->{env} },
-        %{ peek_sub($code) },
+        %$new_env,
     };
 
     return $code;
