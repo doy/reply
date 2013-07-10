@@ -22,22 +22,6 @@ code.
 
 =cut
 
-sub new {
-    my $class = shift;
-
-    my $self = $class->SUPER::new(@_);
-    $self->{package} = 'main';
-
-    return $self;
-}
-
-sub package {
-    my $self = shift;
-    my ($package) = @_;
-
-    $self->{package} = $package;
-}
-
 sub tab_handler {
     my $self = shift;
     my ($line) = @_;
