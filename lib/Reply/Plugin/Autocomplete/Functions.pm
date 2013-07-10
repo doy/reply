@@ -28,6 +28,8 @@ sub tab_handler {
     my ($before, $fragment) = $line =~ /(.*?)(${module_name_rx}(::)?)$/;
     return unless $fragment;
 
+    my $current_package = ($self->publish('package'))[-1];
+
     my ($package, $func);
     if ($fragment =~ /:/) {
         ($package, $func) = ($fragment =~ /^(.+:)(\w*)$/);
@@ -35,20 +37,14 @@ sub tab_handler {
         $package =~ s/:{1,2}$//;
     }
     else {
-        $package = $self->{'package'};
+        $package = $current_package;
         $func = $fragment;
     }
 
     return
-        map  { $package eq $self->{'package'} ? $_ : "$package\::$_" }
+        map  { $package eq $current_package ? $_ : "$package\::$_" }
         grep { $func ? /^\Q$func/ : 1 }
         'Package::Stash'->new($package)->list_all_symbols('CODE');
-}
-
-sub package {
-    my $self = shift;
-    my ($pkg) = @_;
-    $self->{'package'} = $pkg;
 }
 
 1;

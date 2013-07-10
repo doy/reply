@@ -21,7 +21,6 @@ sub new {
 
     my $self = $class->SUPER::new(@_);
     $self->{quit} = 0;
-    $self->{package} = 'main';
 
     return $self;
 }
@@ -48,9 +47,10 @@ sub compile {
     my $self = shift;
     my ($next, $line, %args) = @_;
 
-    my $env = { map { %$_ } $self->publish('lexical_environment') };
+    my $env     = { map { %$_ } $self->publish('lexical_environment') };
+    my $package = ($self->publish('package'))[-1];
 
-    my $prefix = "package $self->{package};\n$PREFIX";
+    my $prefix = "package $package;\n$PREFIX";
 
     my $code = eval_closure(
         source      => "sub {\n$prefix;\n$line\n}",
@@ -64,12 +64,6 @@ sub compile {
     }
 
     return $code;
-}
-
-sub package {
-    my $self = shift;
-    my ($package) = @_;
-    $self->{package} = $package;
 }
 
 sub execute {
