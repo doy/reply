@@ -27,6 +27,7 @@ sub tab_handler {
 
     my ($before, $fragment) = $line =~ /(.*?)(${module_name_rx}(::)?)$/;
     return unless $fragment;
+    return if $before =~ /^#/; # commands
 
     my $current_package = ($self->publish('package'))[-1];
 
