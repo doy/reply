@@ -134,3 +134,4 @@ script_line3 = use 5.XXX
 [Autocomplete::Functions]
 [Autocomplete::Globals]
 [Autocomplete::Methods]
+[Autocomplete::Commands]
