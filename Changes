@@ -1,6 +1,9 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - Add completion plugin for #-commands (#18)
+      - More completion edge case fixes
+      - More internal refactorings
 
 0.26  2013-07-08
       - Let Data::Printer handle coloring in the DataPrinter plugin. (Sawyer X)
