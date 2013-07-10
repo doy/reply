@@ -131,3 +131,6 @@ script_line3 = use 5.XXX
 [ResultCache]
 [Autocomplete::Packages]
 [Autocomplete::Lexicals]
+[Autocomplete::Functions]
+[Autocomplete::Globals]
+[Autocomplete::Methods]
