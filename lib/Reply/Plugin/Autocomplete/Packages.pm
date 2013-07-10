@@ -7,6 +7,8 @@ use base 'Reply::Plugin';
 
 use Module::Runtime '$module_name_rx';
 
+use Reply::Util 'all_packages';
+
 =head1 SYNOPSIS
 
   ; .replyrc
@@ -30,33 +32,7 @@ sub tab_handler {
     return if $before =~ /->\s*$/; # method call
     return if $before =~ /[\$\@\%\&\*]\s*$/;
 
-    my $file_fragment = $package_fragment;
-    $file_fragment =~ s{::}{/}g;
-
-    my $re = qr/^\Q$file_fragment/;
-
-    my @results;
-    for my $inc (keys %INC) {
-        if ($inc =~ $re) {
-            $inc =~ s{/}{::}g;
-            $inc =~ s{\.pm$}{};
-            push @results, $inc;
-        }
-    }
-
-    push @results,
-        grep m/^\Q$package_fragment/,
-        @{$self->{moar_packages}||=[]};
-
-    return @results;
-}
-
-# listen for events from the Packages plugin, for its wise wisdom
-# can teach us about packages that are not in %INC
-sub package {
-    my $self = shift;
-    my ($pkg) = @_;
-    push @{$self->{moar_packages}||=[]}, $pkg;
+    return sort grep { index($_, $package_fragment) == 0 } all_packages();
 }
 
 1;

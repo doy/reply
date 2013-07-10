@@ -17,7 +17,7 @@ use Scalar::Util 'blessed';
 use Exporter 'import';
 our @EXPORT_OK = qw(
     $ident_rx $varname_rx $fq_ident_rx $fq_varname_rx
-    methods
+    methods all_packages
 );
 
 # XXX this should be updated for unicode
@@ -47,6 +47,22 @@ sub methods {
     }
 
     return @methods;
+}
+
+sub all_packages {
+    my ($root) = @_;
+    $root ||= \%::;
+
+    my @packages;
+    for my $fragment (grep { /::$/ } keys %$root) {
+        next if ref($root) && $root == \%:: && $fragment eq 'main::';
+        push @packages, (
+            $fragment,
+            map { $fragment . $_ } all_packages($root->{$fragment})
+        );
+    }
+
+    return map { s/::$//; $_ } @packages;
 }
 
 1;
