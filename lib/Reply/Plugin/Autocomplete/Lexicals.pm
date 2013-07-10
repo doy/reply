@@ -20,22 +20,6 @@ Perl code.
 
 =cut
 
-sub new {
-    my $class = shift;
-
-    my $self = $class->SUPER::new(@_);
-    $self->{env} = [];
-
-    return $self;
-}
-
-sub lexical_environment {
-    my $self = shift;
-    my ($env) = @_;
-
-    push @{ $self->{env} }, $env;
-}
-
 sub tab_handler {
     my $self = shift;
     my ($line) = @_;
@@ -48,7 +32,7 @@ sub tab_handler {
     # these can't be lexicals
     return if $sigil eq '&' || $sigil eq '*';
 
-    my $env = { map { %$_ } @{ $self->{env} } };
+    my $env = { map { %$_ } $self->publish('lexical_environment') };
     my @env = keys %$env;
 
     my @results;

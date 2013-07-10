@@ -44,13 +44,6 @@ sub execute {
         push @{ $self->{results} }, \@res;
     }
 
-    $self->publish(
-        'lexical_environment',
-        {
-            "\@$self->{result_name}" => $self->{results},
-        },
-    );
-
     return @res;
 }
 
@@ -61,6 +54,11 @@ sub mangle_result {
     return unless defined $result;
     return '$' . $self->{result_name} . '[' . $#{ $self->{results} } . '] = '
          . $result;
+}
+
+sub lexical_environment {
+    my $self = shift;
+    return { "\@$self->{result_name}" => $self->{results} };
 }
 
 1;

@@ -41,9 +41,13 @@ sub compile {
         %{ peek_sub($code) },
     };
 
-    $self->publish('lexical_environment', $self->{env});
-
     return $code;
+}
+
+sub lexical_environment {
+    my $self = shift;
+
+    return $self->{env};
 }
 
 1;
