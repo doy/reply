@@ -25,6 +25,7 @@ sub tab_handler {
 
     my ($before, $last_word) = $line =~ /(.*?)(\w+)$/;
     return unless $last_word;
+    return if $before =~ /^#/; # command
     return if $before =~ /::$/; # Package::function call
     return if $before =~ /->\s*$/; # method call
     return if $before =~ /[\$\@\%\&\*]\s*$/;

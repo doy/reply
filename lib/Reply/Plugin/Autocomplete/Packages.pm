@@ -29,6 +29,7 @@ sub tab_handler {
     # $module_name_rx does not permit trailing ::
     my ($before, $package_fragment) = $line =~ /(.*?)(${module_name_rx}:?:?)$/;
     return unless $package_fragment;
+    return if $before =~ /^#/; # command
     return if $before =~ /->\s*$/; # method call
     return if $before =~ /[\$\@\%\&\*]\s*$/;
 

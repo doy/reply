@@ -3,6 +3,8 @@ use strict;
 use warnings;
 # ABSTRACT: base class for Reply plugins
 
+use Reply::Util 'methods';
+
 =head1 SYNOPSIS
 
   package Reply::Plugin::Foo;
@@ -181,6 +183,12 @@ sub publish {
     my $self = shift;
 
     $self->{publisher}->(@_);
+}
+
+sub commands {
+    my $self = shift;
+
+    return map { s/^command_//; $_ } grep { /^command_/ } methods($self);
 }
 
 =for Pod::Coverage
