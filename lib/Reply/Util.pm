@@ -65,4 +65,11 @@ sub all_packages {
     return map { s/::$//; $_ } @packages;
 }
 
+=begin Pod::Coverage
+
+  methods
+  all_packages
+
+=end Pod::Coverage
+
 1;
