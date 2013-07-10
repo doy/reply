@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.27  2013-07-10
       - Add completion plugin for #-commands (#18)
       - More completion edge case fixes
       - More internal refactorings
