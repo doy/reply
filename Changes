@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - Make CollapseStack always run under Carp::Always (#13)
+      - Fix lexical subs (#19)
 
 0.28  2013-07-10
       - remove accidentally added dep on 'mro', which doesn't exist on 5.8
