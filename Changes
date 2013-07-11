@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.29  2013-07-10
       - Make CollapseStack always run under Carp::Always (#13)
       - Fix lexical subs (#19)
 
