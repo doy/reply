@@ -46,7 +46,12 @@ sub new {
         $history
     );
 
-    if ($self->{term}->ReadLine eq 'Term::ReadLine::Gnu') {
+    if ($self->{term}->ReadLine eq 'Term::ReadLine::Perl5') {
+        # output compatible with Term::ReadLine::Gnu
+        $readline::rl_scroll_nextline = 0;
+    }
+
+    if ($self->{term}->ReadLine eq ('Term::ReadLine::Gnu' or 'Term::ReadLine::Perl5')) {
         $self->{term}->StifleHistory($opts{history_length})
             if defined $opts{history_length} && $opts{history_length} >= 0;
     }
@@ -81,7 +86,7 @@ sub DESTROY {
     return if defined $self->{history_length} && $self->{history_length} == 0;
 
     # XXX support more later
-    return unless $self->{term}->ReadLine eq 'Term::ReadLine::Gnu';
+    return unless $self->{term}->ReadLine eq ('Term::ReadLine::Gnu' or 'Term::ReadLine::Perl5');
 
     $self->{term}->WriteHistory($self->{history_file})
         or warn "Couldn't write history to $self->{history_file}";
@@ -108,6 +113,19 @@ sub _register_tab_complete {
                 my ($text, $index) = @_;
                 return $matches[$index];
             });
+        };
+    }
+
+    if ($term->ReadLine eq 'Term::ReadLine::Perl5') {
+        $term->Attribs->{completion_function} = sub {
+            my ($text, $line, $start) = @_;
+            my $end = $start + length($text);
+
+            # discard everything after the cursor for completion purposes
+            substr($line, $end) = '';
+
+            my @matches = $weakself->publish('tab_handler', $line);
+            return scalar(@matches) ? @matches : ();
         };
     }
 }
