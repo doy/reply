@@ -46,6 +46,11 @@ sub new {
         $history
     );
 
+    if ($self->{term}->ReadLine eq 'Term::ReadLine::Perl5') {
+        # output compatible with Term::ReadLine::Gnu
+        $readline::rl_scroll_nextline = 0;
+    }
+
     if ($self->{term}->ReadLine eq ('Term::ReadLine::Gnu' or 'Term::ReadLine::Perl5')) {
         $self->{term}->StifleHistory($opts{history_length})
             if defined $opts{history_length} && $opts{history_length} >= 0;
