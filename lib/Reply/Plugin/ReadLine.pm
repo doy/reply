@@ -46,12 +46,15 @@ sub new {
         $history
     );
 
-    if ($self->{term}->ReadLine eq 'Term::ReadLine::Perl5') {
+    $self->{rl_gnu} = $self->{term}->ReadLine eq 'Term::ReadLine::Gnu';
+    $self->{rl_perl5} = $self->{term}->ReadLine eq 'Term::ReadLine::Perl5';
+
+    if ($self->{rl_perl5}) {
         # output compatible with Term::ReadLine::Gnu
         $readline::rl_scroll_nextline = 0;
     }
 
-    if (($self->{term}->ReadLine eq 'Term::ReadLine::Gnu') || ($self->{term}->ReadLine eq 'Term::ReadLine::Perl5')) {
+    if ($self->{rl_perl5} || $self->{rl_gnu}) {
         $self->{term}->StifleHistory($opts{history_length})
             if defined $opts{history_length} && $opts{history_length} >= 0;
     }
@@ -86,7 +89,7 @@ sub DESTROY {
     return if defined $self->{history_length} && $self->{history_length} == 0;
 
     # XXX support more later
-    return unless ($self->{term}->ReadLine eq 'Term::ReadLine::Gnu') || ($self->{term}->ReadLine eq 'Term::ReadLine::Perl5');
+    return unless ($self->{rl_gnu} || $self->{rl_perl5});
 
     $self->{term}->WriteHistory($self->{history_file})
         or warn "Couldn't write history to $self->{history_file}";
@@ -99,7 +102,7 @@ sub _register_tab_complete {
 
     weaken(my $weakself = $self);
 
-    if ($term->ReadLine eq 'Term::ReadLine::Gnu') {
+    if ($self->{rl_gnu}) {
         $term->Attribs->{attempted_completion_function} = sub {
             my ($text, $line, $start, $end) = @_;
 
@@ -116,7 +119,7 @@ sub _register_tab_complete {
         };
     }
 
-    if ($term->ReadLine eq 'Term::ReadLine::Perl5') {
+    if ($self->{rl_perl5}) {
         $term->Attribs->{completion_function} = sub {
             my ($text, $line, $start) = @_;
             my $end = $start + length($text);
