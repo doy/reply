@@ -21,10 +21,11 @@ use Term::ReadLine;
 
 This plugin uses L<Term::ReadLine> to read lines from the user. This enables
 useful features such as line editing and command history. The history will be
-persisted between runs, by default in C<~/.reply_history>, although this is
-changeable with the C<history_file> option. To limit the number of lines
-written to this file, you can use the C<history_length> option. Setting a
-C<history_length> of C<0> will disable writing history to a file entirely.
+persisted between runs, by default in C<.reply_history> in your application
+data directory, although this is changeable with the C<history_file> option. To
+limit the number of lines written to this file, you can use the
+C<history_length> option. Setting a C<history_length> of C<0> will disable
+writing history to a file entirely.
 
 NOTE: you probably want to install a reasonable L<Term::ReadLine> backend in
 order for this plugin to be very useful. L<Term::ReadLine::Gnu> is highly
