@@ -51,7 +51,7 @@ sub new {
         $readline::rl_scroll_nextline = 0;
     }
 
-    if ($self->{term}->ReadLine eq ('Term::ReadLine::Gnu' or 'Term::ReadLine::Perl5')) {
+    if (($self->{term}->ReadLine eq 'Term::ReadLine::Gnu') || ($self->{term}->ReadLine eq 'Term::ReadLine::Perl5')) {
         $self->{term}->StifleHistory($opts{history_length})
             if defined $opts{history_length} && $opts{history_length} >= 0;
     }
@@ -86,7 +86,7 @@ sub DESTROY {
     return if defined $self->{history_length} && $self->{history_length} == 0;
 
     # XXX support more later
-    return unless $self->{term}->ReadLine eq ('Term::ReadLine::Gnu' or 'Term::ReadLine::Perl5');
+    return unless ($self->{term}->ReadLine eq 'Term::ReadLine::Gnu') || ($self->{term}->ReadLine eq 'Term::ReadLine::Perl5');
 
     $self->{term}->WriteHistory($self->{history_file})
         or warn "Couldn't write history to $self->{history_file}";
