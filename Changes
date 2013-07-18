@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - fix a ReadLine bug introduced in the previous release (Kosuke Asami,
+        #22)
 
 0.30  2013-07-17
       - better support for Term::ReadLine::Perl5 (Kosuke Asami, #20)
