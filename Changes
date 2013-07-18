@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.31  2013-07-18
       - fix a ReadLine bug introduced in the previous release (Kosuke Asami,
         #22)
 
