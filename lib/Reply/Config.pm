@@ -1,7 +1,9 @@
-package Reply::Config;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: config loading for Reply
+
+use mop;
 
 use Config::INI::Reader::Ordered;
 use File::HomeDir;
@@ -37,27 +39,15 @@ be relative to the user's home directory, otherwise it will be used as-is.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %opts = @_;
+class Reply::Config {
+    has $file   = $_->_canonicalize_file('.replyrc');
+    has $config = Config::INI::Reader::Ordered->new;
 
-    $opts{file} = '.replyrc'
-        unless defined $opts{file};
-
-    my $file = File::Spec->catfile(
-        (File::Spec->file_name_is_absolute($opts{file})
-            ? ()
-            : (File::HomeDir->my_home)),
-        $opts{file}
-    );
-
-    my $self = bless {}, $class;
-
-    $self->{file} = $file;
-    $self->{config} = Config::INI::Reader::Ordered->new;
-
-    return $self;
-}
+    submethod BUILD ($args) {
+        if (defined $args->{file}) {
+            $file = $self->_canonicalize_file($args->{file});
+        }
+    }
 
 =method file
 
@@ -65,7 +55,7 @@ Returns the absolute path to the config file that is to be used.
 
 =cut
 
-sub file { shift->{file} }
+    method file { $file }
 
 =method data
 
@@ -73,10 +63,16 @@ Returns the loaded configuration data.
 
 =cut
 
-sub data {
-    my $self = shift;
+    method data { $config->read_file($file) }
 
-    return $self->{config}->read_file($self->{file});
+    method _canonicalize_file ($filename) {
+        return File::Spec->catfile(
+            (File::Spec->file_name_is_absolute($filename)
+                ? ()
+                : (File::HomeDir->my_home)),
+            $filename
+        );
+    }
 }
 
 1;
