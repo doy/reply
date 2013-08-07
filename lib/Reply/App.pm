@@ -3,12 +3,14 @@ use strict;
 use warnings;
 # ABSTRACT: command line app runner for Reply
 
-use mop;
-
 use Getopt::Long 2.36 'GetOptionsFromArray';
 
 use Reply;
 use Reply::Config;
+
+# XXX have to 'use mop' *after* using Reply::Config, or else the stash clearing
+# stuff breaks things
+use mop;
 
 =head1 SYNOPSIS
 
