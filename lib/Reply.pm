@@ -1,7 +1,9 @@
-package Reply;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: read, eval, print, loop, yay!
+
+use mop;
 
 use Module::Runtime qw(compose_module_name require_module);
 use Scalar::Util qw(blessed weaken);
@@ -77,26 +79,20 @@ An arrayref of additional plugins to load.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %opts = @_;
+class Reply {
+    has $plugins = [];
+    has $_default_plugin = $_->_instantiate_plugin('Defaults');
 
-    my $self = bless {}, $class;
-
-    $self->{plugins} = [];
-    $self->{_default_plugin} = $self->_instantiate_plugin('Defaults');
-
-    if (defined $opts{config}) {
-        if (!ref($opts{config})) {
-            $opts{config} = Reply::Config->new(file => $opts{config});
+    submethod BUILD ($opts) {
+        if (defined $opts->{config}) {
+            if (!ref($opts->{config})) {
+                $opts->{config} = Reply::Config->new(file => $opts->{config});
+            }
+            $self->_load_config($opts->{config});
         }
-        $self->_load_config($opts{config});
+
+        $self->_load_plugin($_) for @{ $opts->{plugins} || [] };
     }
-
-    $self->_load_plugin($_) for @{ $opts{plugins} || [] };
-
-    return $self;
-}
 
 =method run
 
@@ -106,15 +102,13 @@ returns false (by default, the C<#q> command quits the repl in this way).
 
 =cut
 
-sub run {
-    my $self = shift;
-
-    while (1) {
-        my $continue = $self->step;
-        last unless $continue;
+    method run {
+        while (1) {
+            my $continue = $self->step;
+            last unless $continue;
+        }
+        print "\n";
     }
-    print "\n";
-}
 
 =method step($line)
 
@@ -125,199 +119,163 @@ requested to quit.
 
 =cut
 
-sub step {
-    my $self = shift;
-    my ($line) = @_;
+    method step ($line) {
+        # XXX $self should be available in parameter defaults too
+        $line = $self->_read unless defined $line;
 
-    $line = $self->_read unless defined $line;
+        return unless defined $line;
 
-    return unless defined $line;
+        $line = $self->_preprocess_line($line);
 
-    $line = $self->_preprocess_line($line);
-
-    try {
-        my @result = $self->_eval($line);
-        $self->_print_result(@result);
-    }
-    catch {
-        $self->_print_error($_);
-    };
-
-    my ($continue) = $self->_loop;
-    return $continue;
-}
-
-sub _load_config {
-    my $self = shift;
-    my ($config) = @_;
-
-    my $data = $config->data;
-
-    my $root_config;
-    for my $section (@$data) {
-        my ($name, $data) = @$section;
-        if ($name eq '_') {
-            $root_config = $data;
+        try {
+            my @result = $self->_eval($line);
+            $self->_print_result(@result);
         }
-        else {
-            $self->_load_plugin($name => $data);
-        }
-    }
-
-    for my $line (sort grep { /^script_line/ } keys %$root_config) {
-        $self->step($root_config->{$line});
-    }
-
-    if (defined(my $file = $root_config->{script_file})) {
-        my $contents = do {
-            open my $fh, '<', $file or die "Couldn't open $file: $!";
-            local $/ = undef;
-            <$fh>
+        catch {
+            $self->_print_error($_);
         };
-        $self->step($contents);
-    }
-}
 
-sub _load_plugin {
-    my $self = shift;
-    my ($plugin, $opts) = @_;
-
-    $plugin = $self->_instantiate_plugin($plugin, $opts);
-
-    push @{ $self->{plugins} }, $plugin;
-}
-
-sub _instantiate_plugin {
-    my $self = shift;
-    my ($plugin, $opts) = @_;
-
-    if (!blessed($plugin)) {
-        $plugin = compose_module_name("Reply::Plugin", $plugin);
-        require_module($plugin);
-        die "$plugin is not a valid plugin"
-            unless $plugin->isa("Reply::Plugin");
-
-        my $weakself = $self;
-        weaken($weakself);
-
-        $plugin = $plugin->new(
-            %$opts,
-            publisher => sub { $weakself->_publish(@_) },
-        );
+        my ($continue) = $self->_loop;
+        return $continue;
     }
 
-    return $plugin;
-}
+    method _load_config ($config) {
+        my $data = $config->data;
 
-sub _plugins {
-    my $self = shift;
+        my $root_config;
+        for my $section (@$data) {
+            my ($name, $data) = @$section;
+            if ($name eq '_') {
+                $root_config = $data;
+            }
+            else {
+                $self->_load_plugin($name => $data);
+            }
+        }
 
-    return (
-        @{ $self->{plugins} },
-        $self->{_default_plugin},
-    );
-}
+        for my $line (sort grep { /^script_line/ } keys %$root_config) {
+            $self->step($root_config->{$line});
+        }
 
-sub _read {
-    my $self = shift;
-
-    my $prompt = $self->_wrapped_plugin('prompt');
-    return $self->_wrapped_plugin('read_line', $prompt);
-}
-
-sub _preprocess_line {
-    my $self = shift;
-    my ($line) = @_;
-
-    if ($line =~ s/^#(\w+)(?:\s+|$)//) {
-        ($line) = $self->_chained_plugin("command_\L$1", $line);
+        if (defined(my $file = $root_config->{script_file})) {
+            my $contents = do {
+                open my $fh, '<', $file or die "Couldn't open $file: $!";
+                local $/ = undef;
+                <$fh>
+            };
+            $self->step($contents);
+        }
     }
 
-    return "\n#line 1 \"reply input\"\n$line";
-}
+    method _load_plugin ($plugin, $opts) {
+        $plugin = $self->_instantiate_plugin($plugin, $opts);
 
-sub _eval {
-    my $self = shift;
-    my ($line) = @_;
-
-    ($line) = $self->_chained_plugin('mangle_line', $line)
-        if defined $line;
-
-    my ($code) = $self->_wrapped_plugin('compile', $line);
-    return $self->_wrapped_plugin('execute', $code);
-}
-
-sub _print_error {
-    my $self = shift;
-    my ($error) = @_;
-
-    ($error) = $self->_chained_plugin('mangle_error', $error);
-    $self->_wrapped_plugin('print_error', $error);
-}
-
-sub _print_result {
-    my $self = shift;
-    my (@result) = @_;
-
-    @result = $self->_chained_plugin('mangle_result', @result);
-    $self->_wrapped_plugin('print_result', @result);
-}
-
-sub _loop {
-    my $self = shift;
-
-    $self->_chained_plugin('loop', 1);
-}
-
-sub _publish {
-    my $self = shift;
-
-    $self->_concatenate_plugin(@_);
-}
-
-sub _wrapped_plugin {
-    my $self = shift;
-    my @plugins = ref($_[0]) ? @{ shift() } : $self->_plugins;
-    my ($method, @args) = @_;
-
-    @plugins = grep { $_->can($method) } @plugins;
-
-    return @args unless @plugins;
-
-    my $plugin = shift @plugins;
-    my $next = sub { $self->_wrapped_plugin(\@plugins, $method, @_) };
-
-    return $plugin->$method($next, @args);
-}
-
-sub _chained_plugin {
-    my $self = shift;
-    my @plugins = ref($_[0]) ? @{ shift() } : $self->_plugins;
-    my ($method, @args) = @_;
-
-    @plugins = grep { $_->can($method) } @plugins;
-
-    for my $plugin (@plugins) {
-        @args = $plugin->$method(@args);
+        push @$plugins, $plugin;
     }
 
-    return @args;
-}
+    method _instantiate_plugin ($plugin, $opts) {
+        if (!blessed($plugin)) {
+            $plugin = compose_module_name("Reply::Plugin", $plugin);
+            require_module($plugin);
+            die "$plugin is not a valid plugin"
+                unless $plugin->isa("Reply::Plugin");
 
-sub _concatenate_plugin {
-    my $self = shift;
-    my @plugins = ref($_[0]) ? @{ shift() } : $self->_plugins;
-    my ($method, @args) = @_;
+            my $weakself = $self;
+            weaken($weakself);
 
-    @plugins = grep { $_->can($method) } @plugins;
+            $plugin = $plugin->new(
+                %$opts,
+                publisher => sub { $weakself->_publish(@_) },
+            );
+        }
 
-    my @results;
-
-    for my $plugin (@plugins) {
-        push @results, $plugin->$method(@args);
+        return $plugin;
     }
 
-    return @results;
+    method _plugins {
+        return (@$plugins, $_default_plugin);
+    }
+
+    method _read {
+        my $prompt = $self->_wrapped_plugin('prompt');
+        return $self->_wrapped_plugin('read_line', [$prompt]);
+    }
+
+    method _preprocess_line ($line) {
+        if ($line =~ s/^#(\w+)(?:\s+|$)//) {
+            ($line) = $self->_chained_plugin("command_\L$1", [$line]);
+        }
+
+        return "\n#line 1 \"reply input\"\n$line";
+    }
+
+    method _eval ($line) {
+        ($line) = $self->_chained_plugin('mangle_line', [$line])
+            if defined $line;
+
+        my ($code) = $self->_wrapped_plugin('compile', [$line]);
+        return $self->_wrapped_plugin('execute', [$code]);
+    }
+
+    method _print_error ($error) {
+        ($error) = $self->_chained_plugin('mangle_error', [$error]);
+        $self->_wrapped_plugin('print_error', [$error]);
+    }
+
+    method _print_result (@result) {
+        @result = $self->_chained_plugin('mangle_result', \@result);
+        $self->_wrapped_plugin('print_result', \@result);
+    }
+
+    method _loop {
+        $self->_chained_plugin('loop', [1]);
+    }
+
+    method _publish ($method, @args) {
+        $self->_concatenate_plugin($method, \@args);
+    }
+
+    method _wrapped_plugin ($method, $args = [], $plugins = undef) {
+        # XXX $self should be available in parameter defaults too
+        $plugins //= [ $self->_plugins ];
+
+        $plugins = [ grep { $_->can($method) } @$plugins ];
+
+        return @$args unless @$plugins;
+
+        my $plugin = shift @$plugins;
+        my $next = sub { $self->_wrapped_plugin($method, [@_], $plugins) };
+
+        return $plugin->$method($next, @$args);
+    }
+
+    method _chained_plugin ($method, $args = [], $plugins = undef) {
+        # XXX $self should be available in parameter defaults too
+        $plugins //= [ $self->_plugins ];
+
+        $plugins = [ grep { $_->can($method) } @$plugins ];
+
+        for my $plugin (@$plugins) {
+            @$args = $plugin->$method(@$args);
+        }
+
+        return @$args;
+    }
+
+    method _concatenate_plugin ($method, $args = [], $plugins = undef) {
+        # XXX $self should be available in parameter defaults too
+        $plugins //= [ $self->_plugins ];
+
+        $plugins = [ grep { $_->can($method) } @$plugins ];
+
+        my @results;
+
+        for my $plugin (@$plugins) {
+            push @results, $plugin->$method(@$args);
+        }
+
+        return @results;
+    }
 }
 
 =head1 BUGS
