@@ -1,7 +1,9 @@
-package Reply::App;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: command line app runner for Reply
+
+use mop;
 
 use Getopt::Long 2.36 'GetOptionsFromArray';
 
@@ -26,68 +28,67 @@ Returns a new Reply::App instance. Takes no arguments.
 
 =cut
 
-sub new { bless {}, shift }
+class Reply::App {
 
 =method run(@argv)
 
-Parses the argument list given (typically from @ARGV), along with the user's configuration file, and attempts to start a Reply shell. A default configuration file will be generated for the user if none exists.
+Parses the argument list given (typically from @ARGV), along with the user's
+configuration file, and attempts to start a Reply shell. A default
+configuration file will be generated for the user if none exists.
 
 =cut
 
-sub run {
-    my $self = shift;
-    my @argv = @_;
+    method run (@argv) {
+        Getopt::Long::Configure("gnu_getopt");
 
-    Getopt::Long::Configure("gnu_getopt");
+        my $cfgfile = '.replyrc';
+        my $exitcode;
+        my @modules;
+        my $parsed = GetOptionsFromArray(
+            \@argv,
+            'cfg:s'   => \$cfgfile,
+            'l|lib'   => sub { push @INC, 'lib' },
+            'b|blib'  => sub { push @INC, 'blib/lib', 'blib/arch' },
+            'I:s@'    => sub { push @INC, $_[1] },
+            'M:s@'    => \@modules,
+            'version' => sub { $exitcode = 0; $self->version },
+            'help'    => sub { $exitcode = 0; $self->usage },
+        );
 
-    my $cfgfile = '.replyrc';
-    my $exitcode;
-    my @modules;
-    my $parsed = GetOptionsFromArray(
-        \@argv,
-        'cfg:s'   => \$cfgfile,
-        'l|lib'   => sub { push @INC, 'lib' },
-        'b|blib'  => sub { push @INC, 'blib/lib', 'blib/arch' },
-        'I:s@'    => sub { push @INC, $_[1] },
-        'M:s@'    => \@modules,
-        'version' => sub { $exitcode = 0; version() },
-        'help'    => sub { $exitcode = 0; usage() },
-    );
-
-    if (!$parsed) {
-        usage(1);
-        $exitcode = 1;
-    }
-
-    return $exitcode if defined $exitcode;
-
-    my $cfg = Reply::Config->new(file => $cfgfile);
-
-    my %args = (config => $cfg);
-    my $file = $cfg->file;
-    if (!-e $file) {
-        print("$file not found. Generating a default...\n");
-        if (open my $fh, '>', $file) {
-            my $contents = do {
-                local $/;
-                <DATA>
-            };
-            $contents =~ s/use 5.XXX/use $]/;
-            print $fh $contents;
-            close $fh;
+        if (!$parsed) {
+            $self->usage(1);
+            $exitcode = 1;
         }
-        else {
-            warn "Couldn't write to $file";
-            %args = ();
+
+        return $exitcode if defined $exitcode;
+
+        my $cfg = Reply::Config->new(file => $cfgfile);
+
+        my %args = (config => $cfg);
+        my $file = $cfg->file;
+        if (!-e $file) {
+            print("$file not found. Generating a default...\n");
+            if (open my $fh, '>', $file) {
+                my $contents = do {
+                    local $/;
+                    <DATA>
+                };
+                $contents =~ s/use 5.XXX/use $]/;
+                print $fh $contents;
+                close $fh;
+            }
+            else {
+                warn "Couldn't write to $file";
+                %args = ();
+            }
         }
+
+        my $reply = Reply->new(%args);
+        $reply->step("use $_") for @modules;
+        $reply->run;
+
+        return 0;
     }
-
-    my $reply = Reply->new(%args);
-    $reply->step("use $_") for @modules;
-    $reply->run;
-
-    return 0;
-}
 
 =method usage($exitcode)
 
@@ -96,10 +97,10 @@ printed to C<STDOUT>, otherwise it will be printed to C<STDERR>.
 
 =cut
 
-sub usage {
-    my $fh = $_[0] ? *STDERR : *STDOUT;
-    print $fh "    reply [-lb] [-I dir] [-M mod] [--version] [--help] [--cfg file]\n";
-}
+    method usage ($exitcode) {
+        my $fh = $exitcode ? *STDERR : *STDOUT;
+        print $fh "    reply [-lb] [-I dir] [-M mod] [--version] [--help] [--cfg file]\n";
+    }
 
 =method version($exitcode)
 
@@ -108,9 +109,10 @@ printed to C<STDOUT>, otherwise it will be printed to C<STDERR>.
 
 =cut
 
-sub version {
-    my $fh = $_[0] ? *STDERR : *STDOUT;
-    print $fh "Reply version $Reply::VERSION\n";
+    method version ($exitcode) {
+        my $fh = $exitcode ? *STDERR : *STDOUT;
+        print $fh "Reply version $Reply::VERSION\n";
+    }
 }
 
 1;
