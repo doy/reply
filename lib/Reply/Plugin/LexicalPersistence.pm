@@ -1,9 +1,9 @@
-package Reply::Plugin::LexicalPersistence;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: persists lexical variables between lines
 
-use base 'Reply::Plugin';
+use mop;
 
 use PadWalker 'peek_sub', 'closed_over';
 
@@ -20,37 +20,21 @@ then use C<$x> as expected in subsequent lines.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %opts = @_;
+class Reply::Plugin::LexicalPersistence extends Reply::Plugin {
+    has $env = {};
 
-    my $self = $class->SUPER::new(@_);
-    $self->{env} = {};
+    method compile ($next, $line, %args) {
+        my ($code) = $next->($line, %args);
 
-    return $self;
-}
+        my $new_env = peek_sub($code);
+        delete $new_env->{$_} for keys %{ closed_over($code) };
 
-sub compile {
-    my $self = shift;
-    my ($next, $line, %args) = @_;
+        $env = { %$env, %$new_env };
 
-    my ($code) = $next->($line, %args);
+        return $code;
+    }
 
-    my $new_env = peek_sub($code);
-    delete $new_env->{$_} for keys %{ closed_over($code) };
-
-    $self->{env} = {
-        %{ $self->{env} },
-        %$new_env,
-    };
-
-    return $code;
-}
-
-sub lexical_environment {
-    my $self = shift;
-
-    return $self->{env};
+    method lexical_environment { $env }
 }
 
 1;

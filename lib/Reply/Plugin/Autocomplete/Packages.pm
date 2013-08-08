@@ -1,9 +1,9 @@
-package Reply::Plugin::Autocomplete::Packages;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: tab completion for package names
 
-use base 'Reply::Plugin';
+use mop;
 
 use Module::Runtime '$module_name_rx';
 
@@ -22,18 +22,18 @@ code.
 
 =cut
 
-sub tab_handler {
-    my $self = shift;
-    my ($line) = @_;
+class Reply::Plugin::Autocomplete::Packages extends Reply::Plugin {
+    method tab_handler ($line) {
 
-    # $module_name_rx does not permit trailing ::
-    my ($before, $package_fragment) = $line =~ /(.*?)(${module_name_rx}:?:?)$/;
-    return unless $package_fragment;
-    return if $before =~ /^#/; # command
-    return if $before =~ /->\s*$/; # method call
-    return if $before =~ /[\$\@\%\&\*]\s*$/;
+        # $module_name_rx does not permit trailing ::
+        my ($before, $package_fragment) = $line =~ /(.*?)(${module_name_rx}:?:?)$/;
+        return unless $package_fragment;
+        return if $before =~ /^#/; # command
+        return if $before =~ /->\s*$/; # method call
+        return if $before =~ /[\$\@\%\&\*]\s*$/;
 
-    return sort grep { index($_, $package_fragment) == 0 } all_packages();
+        return sort grep { index($_, $package_fragment) == 0 } all_packages();
+    }
 }
 
 1;

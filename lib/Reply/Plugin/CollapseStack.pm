@@ -1,9 +1,9 @@
-package Reply::Plugin::CollapseStack;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: display error stack traces only on demand
 
-use base 'Reply::Plugin';
+use mop;
 
 {
     local @SIG{qw(__DIE__ __WARN__)};
@@ -26,54 +26,39 @@ the C<num_lines> option.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %opts = @_;
+class Reply::Plugin::CollapseStack extends Reply::Plugin {
+    has $num_lines = 1;
 
-    my $self = $class->SUPER::new(@_);
-    $self->{num_lines} = $opts{num_lines} || 1;
+    has $full_error;
 
-    return $self;
-}
-
-sub compile {
-    my $self = shift;
-    my ($next, @args) = @_;
-
-    local $SIG{__DIE__} = \&Carp::Always::_die;
-    $next->(@args);
-}
-
-sub execute {
-    my $self = shift;
-    my ($next, @args) = @_;
-
-    local $SIG{__DIE__} = \&Carp::Always::_die;
-    $next->(@args);
-}
-
-sub mangle_error {
-    my $self = shift;
-    my $error = shift;
-
-    $self->{full_error} = $error;
-
-    my @lines = split /\n/, $error;
-    if (@lines > $self->{num_lines}) {
-        splice @lines, $self->{num_lines};
-        $error = join "\n", @lines, "    (Run #stack to see the full trace)\n";
+    method compile ($next, @args) {
+        local $SIG{__DIE__} = \&Carp::Always::_die;
+        $next->(@args);
     }
 
-    return $error;
-}
+    method execute ($next, @args) {
+        local $SIG{__DIE__} = \&Carp::Always::_die;
+        $next->(@args);
+    }
 
-sub command_stack {
-    my $self = shift;
+    method mangle_error ($error) {
+        $full_error = $error;
 
-    # XXX should use print_error here
-    print($self->{full_error} || "No stack to display.\n");
+        my @lines = split /\n/, $error;
+        if (@lines > $num_lines) {
+            splice @lines, $num_lines;
+            $error = join "\n", @lines,
+                                "    (Run #stack to see the full trace)\n";
+        }
 
-    return '';
+        return $error;
+    }
+
+    method command_stack {
+        # XXX should use print_error here
+        print($self->{full_error} || "No stack to display.\n");
+        return '';
+    }
 }
 
 =for Pod::Coverage

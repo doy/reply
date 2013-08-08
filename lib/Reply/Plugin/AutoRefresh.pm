@@ -1,9 +1,10 @@
-package Reply::Plugin::AutoRefresh;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: automatically refreshes the external code you use
 
-use base 'Reply::Plugin';
+use mop;
+
 use Class::Refresh 0.05 ();
 
 =head1 SYNOPSIS
@@ -28,31 +29,25 @@ modules correctly see the global override.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %opts = @_;
+class Reply::Plugin::AutoRefresh extends Reply::Plugin {
+    has $track_require = 1;
 
-    $opts{track_require} = 1
-        unless defined $opts{track_require};
+    submethod BUILD {
+        Class::Refresh->import(track_require => $track_require);
 
-    Class::Refresh->import(track_require => $opts{track_require});
+        # so that when we load things after this plugin, they get a copy of
+        # Module::Runtime which has the call to require() rebound to our
+        # overridden copy. if this plugin is loaded first, these should be the
+        # only modules loaded so far which load arbitrary user-specified
+        # modules.
+        Class::Refresh->refresh_module('Module::Runtime');
+        Class::Refresh->refresh_module('base');
+    }
 
-    # so that when we load things after this plugin, they get a copy of
-    # Module::Runtime which has the call to require() rebound to our overridden
-    # copy. if this plugin is loaded first, these should be the only
-    # modules loaded so far which load arbitrary user-specified modules.
-    Class::Refresh->refresh_module('Module::Runtime');
-    Class::Refresh->refresh_module('base');
-
-    return $class->SUPER::new(@_);
-}
-
-sub compile {
-    my $self = shift;
-    my ($next, @args) = @_;
-
-    Class::Refresh->refresh;
-    $next->(@args);
+    method compile ($next, @args) {
+        Class::Refresh->refresh;
+        $next->(@args);
+    }
 }
 
 1;

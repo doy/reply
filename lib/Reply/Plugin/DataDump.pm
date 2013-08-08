@@ -1,9 +1,9 @@
-package Reply::Plugin::DataDump;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: format results using Data::Dump
 
-use base 'Reply::Plugin';
+use mop;
 
 use Data::Dump 'dumpf';
 use overload ();
@@ -23,14 +23,9 @@ value.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %opts = @_;
-    $opts{respect_stringification} = 1
-        unless defined $opts{respect_stringification};
-
-    my $self = $class->SUPER::new(@_);
-    $self->{filter} = sub {
+class Reply::Plugin::DataDump extends Reply::Plugin {
+    has $respect_stringification = 1;
+    has $filter = sub {
         my ($ctx, $ref) = @_;
         return unless $ctx->is_blessed;
         my $stringify = overload::Method($ref, '""');
@@ -38,15 +33,15 @@ sub new {
         return {
             dump => $stringify->($ref),
         };
-    } if $opts{respect_stringification};
+    };
 
-    return $self;
-}
+    submethod BUILD {
+        undef $filter unless $respect_stringification;
+    }
 
-sub mangle_result {
-    my $self = shift;
-    my (@result) = @_;
-    return @result ? dumpf(@result, $self->{filter}) : ();
+    method mangle_result (@result) {
+        return @result ? dumpf(@result, $filter) : ();
+    }
 }
 
 1;

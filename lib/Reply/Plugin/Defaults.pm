@@ -1,4 +1,4 @@
-package Reply::Plugin::Defaults;
+package main;
 
 # XXX Eval::Closure imposes its own hints on things that are eval'ed at the
 # moment, but this may be fixed in the future
@@ -11,28 +11,9 @@ BEGIN {
 use strict;
 use warnings;
 
-use base 'Reply::Plugin';
+use mop;
 
 use Eval::Closure 0.11;
-
-sub new {
-    my $class = shift;
-
-    my $self = $class->SUPER::new(@_);
-    $self->{quit} = 0;
-
-    return $self;
-}
-
-sub prompt { "> " }
-
-sub read_line {
-    my $self = shift;
-    my ($next, $prompt) = @_;
-
-    print $prompt;
-    return scalar <>;
-}
 
 (my $PREFIX = <<'PREFIX') =~ s/__PACKAGE__/__PACKAGE__/ge;
 BEGIN {
@@ -42,62 +23,54 @@ BEGIN {
 }
 PREFIX
 
-sub compile {
-    my $self = shift;
-    my ($next, $line, %args) = @_;
+class Reply::Plugin::Defaults extends Reply::Plugin {
+    has $quit = 0;
 
-    my $env     = { map { %$_ } $self->publish('lexical_environment') };
-    my $package = ($self->publish('package'))[-1];
+    method prompt { "> " }
 
-    my $prefix = "package $package;\n$PREFIX";
+    method read_line ($next, $prompt) {
+        print $prompt;
+        return scalar <>;
+    }
 
-    my $code = eval_closure(
-        source      => "sub {\n$prefix;\n$line\n}",
-        terse_error => 1,
-        alias       => 1,
-        environment => $env,
-        %args,
-    );
+    method compile ($next, $line, %args) {
+        my $env     = { map { %$_ } $self->publish('lexical_environment') };
+        my $package = ($self->publish('package'))[-1];
 
-    return $code;
-}
+        my $prefix = "package $package;\n$PREFIX";
 
-sub execute {
-    my $self = shift;
-    my ($next, $code, @args) = @_;
+        my $code = eval_closure(
+            source      => "sub {\n$prefix;\n$line\n}",
+            terse_error => 1,
+            alias       => 1,
+            environment => $env,
+            %args,
+        );
 
-    return $code->(@args);
-}
+        return $code;
+    }
 
-sub print_error {
-    my $self = shift;
-    my ($next, $error) = @_;
+    method execute ($next, $code, @args) {
+        return $code->(@args);
+    }
 
-    print $error
-        if defined $error;
-}
+    method print_error ($next, $error) {
+        print $error if defined $error;
+    }
 
-sub print_result {
-    my $self = shift;
-    my ($next, @result) = @_;
+    method print_result ($next, @result) {
+        print @result, "\n" if @result;
+    }
 
-    print @result, "\n"
-        if @result;
-}
+    method command_q {
+        $quit = 1;
+        return '';
+    }
 
-sub command_q {
-    my $self = shift;
-    $self->{quit} = 1;
-    return '';
-}
-
-sub loop {
-    my $self = shift;
-    my ($continue) = @_;
-
-    $continue = 0 if $self->{quit};
-
-    return $continue;
+    method loop ($continue) {
+        $continue = 0 if $quit;
+        $continue;
+    }
 }
 
 =begin Pod::Coverage

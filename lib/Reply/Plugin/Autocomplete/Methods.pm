@@ -1,9 +1,9 @@
-package Reply::Plugin::Autocomplete::Methods;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: tab completion for methods
 
-use base 'Reply::Plugin';
+use mop;
 
 use Scalar::Util 'blessed';
 
@@ -22,37 +22,36 @@ code.
 
 =cut
 
-sub tab_handler {
-    my $self = shift;
-    my ($line) = @_;
+class Reply::Plugin::Autocomplete::Methods extends Reply::Plugin {
+    method tab_handler ($line) {
+        my ($invocant, $method_prefix) = $line =~ /($fq_varname_rx|$fq_ident_rx)->($ident_rx)?$/;
+        return unless $invocant;
+        # XXX unicode
+        return unless $invocant =~ /^[\$A-Z_a-z]/;
 
-    my ($invocant, $method_prefix) = $line =~ /($fq_varname_rx|$fq_ident_rx)->($ident_rx)?$/;
-    return unless $invocant;
-    # XXX unicode
-    return unless $invocant =~ /^[\$A-Z_a-z]/;
+        $method_prefix = '' unless defined $method_prefix;
 
-    $method_prefix = '' unless defined $method_prefix;
+        my $class;
+        if ($invocant =~ /^\$/) {
+            # XXX should support globals here
+            my $env = {
+                map { %$_ } $self->publish('lexical_environment'),
+            };
+            my $var = $env->{$invocant};
+            return unless $var && ref($var) eq 'REF' && blessed($$var);
+            $class = blessed($$var);
+        }
+        else {
+            $class = $invocant;
+        }
 
-    my $class;
-    if ($invocant =~ /^\$/) {
-        # XXX should support globals here
-        my $env = {
-            map { %$_ } $self->publish('lexical_environment'),
-        };
-        my $var = $env->{$invocant};
-        return unless $var && ref($var) eq 'REF' && blessed($$var);
-        $class = blessed($$var);
+        my @results;
+        for my $method (methods($class)) {
+            push @results, $method if index($method, $method_prefix) == 0;
+        }
+
+        return sort @results;
     }
-    else {
-        $class = $invocant;
-    }
-
-    my @results;
-    for my $method (methods($class)) {
-        push @results, $method if index($method, $method_prefix) == 0;
-    }
-
-    return sort @results;
 }
 
 1;

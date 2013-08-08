@@ -1,9 +1,9 @@
-package Reply::Plugin::Nopaste;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: command to nopaste a transcript of the current session
 
-use base 'Reply::Plugin';
+use mop;
 
 use App::Nopaste;
 
@@ -27,79 +27,62 @@ like [DataDump], etc).
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %opts = @_;
+class Reply::Plugin::Nopaste extends Reply::Plugin {
+    has $history = '';
+    has $service;
 
-    my $self = $class->SUPER::new(@_);
-    $self->{history} = '';
-    $self->{service} = $opts{service};
+    has $prompt;
+    has $line;
+    has $result;
 
-    return $self;
-}
+    method prompt ($next, @args) {
+        $prompt = $next->(@args);
+        return $prompt;
+    }
 
-sub prompt {
-    my $self = shift;
-    my ($next, @args) = @_;
-    my $prompt = $next->(@args);
-    $self->{prompt} = $prompt;
-    return $prompt;
-}
+    method read_line ($next, @args) {
+        $line = $next->(@args);
+        $line = "$line\n" if defined $line;
+        return $line;
+    }
 
-sub read_line {
-    my $self = shift;
-    my ($next, @args) = @_;
-    my $line = $next->(@args);
-    $self->{line} = "$line\n" if defined $line;
-    return $line;
-}
+    method print_error ($next, $error) {
+        $result = $error;
+        $next->($error);
+    }
 
-sub print_error {
-    my $self = shift;
-    my ($next, $error) = @_;
-    $self->{result} = $error;
-    $next->($error);
-}
+    method print_result ($next, @result) {
+        $result = @result ? join('', @result) . "\n" : '';
+        $next->(@result);
+    }
 
-sub print_result {
-    my $self = shift;
-    my ($next, @result) = @_;
-    $self->{result} = @result ? join('', @result) . "\n" : '';
-    $next->(@result);
-}
+    method loop ($continue) {
+        $history .= "$prompt$line$result"
+            if defined $prompt
+            && defined $line
+            && defined $result;
 
-sub loop {
-    my $self = shift;
-    my ($continue) = @_;
+        undef $prompt;
+        undef $line;
+        undef $result;
 
-    my $prompt = delete $self->{prompt};
-    my $line   = delete $self->{line};
-    my $result = delete $self->{result};
+        $continue;
+    }
 
-    $self->{history} .= "$prompt$line$result"
-        if defined $prompt
-        && defined $line
-        && defined $result;
+    method command_nopaste ($cmd_line) {
+        $cmd_line = "Reply session" unless length $cmd_line;
 
-    $continue;
-}
+        print App::Nopaste->nopaste(
+            text => $history,
+            desc => $cmd_line,
+            lang => 'perl',
+            (defined $service
+                ? (services => [ $service ])
+                : ()),
+        ) . "\n";
 
-sub command_nopaste {
-    my $self = shift;
-    my ($line) = @_;
-
-    $line = "Reply session" unless length $line;
-
-    print App::Nopaste->nopaste(
-        text => $self->{history},
-        desc => $line,
-        lang => 'perl',
-        (defined $self->{service}
-            ? (services => [ $self->{service} ])
-            : ()),
-    ) . "\n";
-
-    return '';
+        return '';
+    }
 }
 
 =for Pod::Coverage

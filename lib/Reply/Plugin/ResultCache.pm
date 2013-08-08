@@ -1,9 +1,9 @@
-package Reply::Plugin::ResultCache;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: retain previous results to be able to refer to them later
 
-use base 'Reply::Plugin';
+use mop;
 
 =head1 SYNOPSIS
 
@@ -21,44 +21,30 @@ include an indication of where the value is stored, for later reference.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %opts = @_;
+class Reply::Plugin::ResultCache extends Reply::Plugin {
+    has $results = [];
+    has $variable = 'res';
 
-    my $self = $class->SUPER::new(@_);
-    $self->{results} = [];
-    $self->{result_name} = $opts{variable} || 'res';
+    method execute ($next, @args) {
+        my @res = $next->(@args);
+        if (@res == 1) {
+            push @$results, $res[0];
+        }
+        elsif (@res > 1) {
+            push @$results, \@res;
+        }
 
-    return $self;
-}
-
-sub execute {
-    my $self = shift;
-    my ($next, @args) = @_;
-
-    my @res = $next->(@args);
-    if (@res == 1) {
-        push @{ $self->{results} }, $res[0];
-    }
-    elsif (@res > 1) {
-        push @{ $self->{results} }, \@res;
+        return @res;
     }
 
-    return @res;
-}
+    method mangle_result ($result) {
+        return unless defined $result;
+        return '$' . $variable . '[' . $#$results . '] = ' . $result;
+    }
 
-sub mangle_result {
-    my $self = shift;
-    my ($result) = @_;
-
-    return unless defined $result;
-    return '$' . $self->{result_name} . '[' . $#{ $self->{results} } . '] = '
-         . $result;
-}
-
-sub lexical_environment {
-    my $self = shift;
-    return { "\@$self->{result_name}" => [ @{ $self->{results} } ] };
+    method lexical_environment {
+        return { "\@$variable" => [ @$results ] };
+    }
 }
 
 1;

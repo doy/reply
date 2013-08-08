@@ -1,9 +1,9 @@
-package Reply::Plugin::Autocomplete::Globals;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: tab completion for global variables
 
-use base 'Reply::Plugin';
+use mop;
 
 use Package::Stash;
 
@@ -22,61 +22,52 @@ Perl code.
 
 =cut
 
-sub new {
-    my $class = shift;
+class Reply::Plugin::Autocomplete::Globals extends Reply::Plugin {
+    method tab_handler ($line) {
+        my ($maybe_var) = $line =~ /($fq_varname_rx)$/;
+        return unless $maybe_var;
+        $maybe_var =~ s/\s+//g;
 
-    my $self = $class->SUPER::new(@_);
+        my ($sigil, $rest) = $maybe_var =~ /(.)(.*)/;
 
-    return $self;
-}
+        my @parts = split '::', $rest, -1;
+        return if grep { /:/ } @parts;
+        return if @parts && $parts[0] =~ /^[0-9]/;
 
-sub tab_handler {
-    my $self = shift;
-    my ($line) = @_;
+        my $var_prefix = pop @parts;
+        $var_prefix = '' unless defined $var_prefix;
 
-    my ($maybe_var) = $line =~ /($fq_varname_rx)$/;
-    return unless $maybe_var;
-    $maybe_var =~ s/\s+//g;
+        my $stash_name = join('::', @parts);
+        my $stash = eval {
+            Package::Stash->new(@parts ? $stash_name : 'main')
+        };
+        return unless $stash;
 
-    my ($sigil, $rest) = $maybe_var =~ /(.)(.*)/;
+        my @symbols = map { s/^(.)main::/$1/; $_ } _recursive_symbols($stash);
 
-    my @parts = split '::', $rest, -1;
-    return if grep { /:/ } @parts;
-    return if @parts && $parts[0] =~ /^[0-9]/;
+        my $prefix = $stash_name
+            ? $stash_name . '::' . $var_prefix
+            : $var_prefix;
 
-    my $var_prefix = pop @parts;
-    $var_prefix = '' unless defined $var_prefix;
+        my @results;
+        for my $global (@symbols) {
+            my ($global_sigil, $global_name) = $global =~ /(.)(.*)/;
+            next unless index($global_name, $prefix) == 0;
 
-    my $stash_name = join('::', @parts);
-    my $stash = eval {
-        Package::Stash->new(@parts ? $stash_name : 'main')
-    };
-    return unless $stash;
-
-    my @symbols = map { s/^(.)main::/$1/; $_ } _recursive_symbols($stash);
-
-    my $prefix = $stash_name
-        ? $stash_name . '::' . $var_prefix
-        : $var_prefix;
-
-    my @results;
-    for my $global (@symbols) {
-        my ($global_sigil, $global_name) = $global =~ /(.)(.*)/;
-        next unless index($global_name, $prefix) == 0;
-
-        # this is weird, not sure why % gets stripped but not $ or @
-        if ($sigil eq $global_sigil) {
-            push @results, $sigil eq '%' ? $global : $global_name;
+            # this is weird, not sure why % gets stripped but not $ or @
+            if ($sigil eq $global_sigil) {
+                push @results, $sigil eq '%' ? $global : $global_name;
+            }
+            elsif ($global_sigil eq '@' && $sigil eq '$') {
+                push @results, "$global_name\[";
+            }
+            elsif ($global_sigil eq '%') {
+                push @results, "$global_name\{";
+            }
         }
-        elsif ($global_sigil eq '@' && $sigil eq '$') {
-            push @results, "$global_name\[";
-        }
-        elsif ($global_sigil eq '%') {
-            push @results, "$global_name\{";
-        }
+
+        return @results;
     }
-
-    return @results;
 }
 
 sub _recursive_symbols {

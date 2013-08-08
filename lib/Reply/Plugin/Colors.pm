@@ -1,9 +1,9 @@
-package Reply::Plugin::Colors;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: colorize output
 
-use base 'Reply::Plugin';
+use mop;
 
 use Term::ANSIColor;
 BEGIN {
@@ -17,9 +17,9 @@ BEGIN {
 
   ; .replyrc
   [Colors]
-  error   = bright red
-  warning = bright yellow
-  result  = bright green
+  error_color   = bright red
+  warning_color = bright yellow
+  result_color  = bright green
 
 =head1 DESCRIPTION
 
@@ -32,62 +32,41 @@ C<result> options.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %opts = @_;
+class Reply::Plugin::Colors extends Reply::Plugin {
+    has $error_color   = 'red';
+    has $warning_color = 'yellow';
+    has $result_color  = 'green';
 
-    my $self = $class->SUPER::new(@_);
-    $self->{error} = $opts{error} || 'red';
-    $self->{warning} = $opts{warning} || 'yellow';
-    $self->{result} = $opts{result} || 'green';
+    method compile ($next, @args) {
+        local $SIG{__WARN__} = sub { $self->print_warn(@_) };
+        $next->(@args);
+    }
 
-    return $self;
-}
+    method execute ($next, @args) {
+        local $SIG{__WARN__} = sub { $self->print_warn(@_) };
+        $next->(@args);
+    }
 
-sub compile {
-    my $self = shift;
-    my ($next, @args) = @_;
+    method print_error ($next, $error) {
+        print color($error_color);
+        $next->($error);
+        local $| = 1;
+        print color('reset');
+    }
 
-    local $SIG{__WARN__} = sub { $self->print_warn(@_) };
-    $next->(@args);
-}
+    method print_result ($next, @result) {
+        print color($result_color);
+        $next->(@result);
+        local $| = 1;
+        print color('reset');
+    }
 
-sub execute {
-    my $self = shift;
-    my ($next, @args) = @_;
-
-    local $SIG{__WARN__} = sub { $self->print_warn(@_) };
-    $next->(@args);
-}
-
-sub print_error {
-    my $self = shift;
-    my ($next, $error) = @_;
-
-    print color($self->{error});
-    $next->($error);
-    local $| = 1;
-    print color('reset');
-}
-
-sub print_result {
-    my $self = shift;
-    my ($next, @result) = @_;
-
-    print color($self->{result});
-    $next->(@result);
-    local $| = 1;
-    print color('reset');
-}
-
-sub print_warn {
-    my $self = shift;
-    my ($warning) = @_;
-
-    print color($self->{warning});
-    print $warning;
-    local $| = 1;
-    print color('reset');
+    method print_warn ($warning) {
+        print color($warning_color);
+        print $warning;
+        local $| = 1;
+        print color('reset');
+    }
 }
 
 =for Pod::Coverage
