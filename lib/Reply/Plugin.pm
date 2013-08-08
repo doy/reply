@@ -1,7 +1,9 @@
-package Reply::Plugin;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: base class for Reply plugins
+
+use mop;
 
 use Reply::Util 'methods';
 
@@ -168,16 +170,8 @@ messages you want to communicate.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my (%opts) = @_;
-
-    die "publisher is required" unless $opts{publisher};
-
-    return bless {
-        publisher => $opts{publisher},
-    }, $class;
-}
+class Reply::Plugin is sealed, instance('HASH') {
+    has $publisher = die "publisher is required";
 
 =method publish ($name, @args)
 
@@ -187,11 +181,9 @@ the parameters. Returns a list of everything that each plugin responded with.
 
 =cut
 
-sub publish {
-    my $self = shift;
-
-    $self->{publisher}->(@_);
-}
+    method publish ($method, @args) {
+        $publisher->($method, @args);
+    }
 
 =method commands
 
@@ -202,10 +194,9 @@ session.
 
 =cut
 
-sub commands {
-    my $self = shift;
-
-    return map { s/^command_//; $_ } grep { /^command_/ } methods($self);
+    method commands {
+        map { s/^command_//; $_ } grep { /^command_/ } methods($self);
+    }
 }
 
 =for Pod::Coverage
