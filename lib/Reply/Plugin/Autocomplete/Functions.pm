@@ -1,9 +1,9 @@
-package Reply::Plugin::Autocomplete::Functions;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: tab completion for function names
 
-use base 'Reply::Plugin';
+use mop;
 
 use Module::Runtime '$module_name_rx';
 use Package::Stash;
@@ -21,31 +21,30 @@ code, including imported functions.
 
 =cut
 
-sub tab_handler {
-    my $self = shift;
-    my ($line) = @_;
+class Reply::Plugin::Autocomplete::Functions extends Reply::Plugin {
+    method tab_handler ($line) {
+        my ($before, $fragment) = $line =~ /(.*?)(${module_name_rx}(::)?)$/;
+        return unless $fragment;
+        return if $before =~ /^#/; # commands
 
-    my ($before, $fragment) = $line =~ /(.*?)(${module_name_rx}(::)?)$/;
-    return unless $fragment;
-    return if $before =~ /^#/; # commands
+        my $current_package = ($self->publish('package'))[-1];
 
-    my $current_package = ($self->publish('package'))[-1];
+        my ($package, $func);
+        if ($fragment =~ /:/) {
+            ($package, $func) = ($fragment =~ /^(.+:)(\w*)$/);
+            $func = '' unless defined $func;
+            $package =~ s/:{1,2}$//;
+        }
+        else {
+            $package = $current_package;
+            $func = $fragment;
+        }
 
-    my ($package, $func);
-    if ($fragment =~ /:/) {
-        ($package, $func) = ($fragment =~ /^(.+:)(\w*)$/);
-        $func = '' unless defined $func;
-        $package =~ s/:{1,2}$//;
+        return
+            map  { $package eq $current_package ? $_ : "$package\::$_" }
+            grep { $func ? /^\Q$func/ : 1 }
+            Package::Stash->new($package)->list_all_symbols('CODE');
     }
-    else {
-        $package = $current_package;
-        $func = $fragment;
-    }
-
-    return
-        map  { $package eq $current_package ? $_ : "$package\::$_" }
-        grep { $func ? /^\Q$func/ : 1 }
-        'Package::Stash'->new($package)->list_all_symbols('CODE');
 }
 
 1;

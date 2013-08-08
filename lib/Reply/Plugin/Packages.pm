@@ -1,9 +1,9 @@
-package Reply::Plugin::Packages;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: persist the current package between lines
 
-use base 'Reply::Plugin';
+use mop;
 
 =head1 SYNOPSIS
 
@@ -20,47 +20,37 @@ initial package to use when Reply starts up.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %opts = @_;
+class Reply::Plugin::Packages extends Reply::Plugin {
+    has $package = 'main';
 
-    my $self = $class->SUPER::new(@_);
-    $self->{package} = $opts{default_package} || 'main';
+    submethod BUILD ($args) {
+        $package = $args->{default_package}
+            if defined $args->{default_package};
+    }
 
-    return $self;
-}
-
-sub mangle_line {
-    my $self = shift;
-    my ($line) = @_;
-
-    my $package = __PACKAGE__;
-    return <<LINE;
+    method mangle_line ($line) {
+        my $package = __PACKAGE__;
+        return <<LINE;
 $line
 ;
 BEGIN {
-    \$${package}::package = __PACKAGE__;
+    \$${package}::PACKAGE = __PACKAGE__;
 }
 LINE
-}
+    }
 
-sub compile {
-    my $self = shift;
-    my ($next, $line, %args) = @_;
+    method compile ($next, $line, %args) {
+        my @result = $next->($line, %args);
 
-    my @result = $next->($line, %args);
+        # XXX it'd be nice to avoid using globals here, but we can't use
+        # eval_closure's environment parameter since we need to access the
+        # information in a BEGIN block
+        $package = our $PACKAGE;
 
-    # XXX it'd be nice to avoid using globals here, but we can't use
-    # eval_closure's environment parameter since we need to access the
-    # information in a BEGIN block
-    $self->{package} = our $package;
+        return @result;
+    }
 
-    return @result;
-}
-
-sub package {
-    my $self = shift;
-    return $self->{package};
+    method package { $package }
 }
 
 1;

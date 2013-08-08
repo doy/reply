@@ -1,9 +1,9 @@
-package Reply::Plugin::Interrupt;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: allows using Ctrl+C to interrupt long-running lines
 
-use base 'Reply::Plugin';
+use mop;
 
 =head1 SYNOPSIS
 
@@ -17,20 +17,16 @@ exiting the Reply shell entirely.
 
 =cut
 
-sub compile {
-    my $self = shift;
-    my ($next, @args) = @_;
+class Reply::Plugin::Interrupt extends Reply::Plugin {
+    method compile ($next, @args) {
+        local $SIG{INT} = sub { die "Interrupted" };
+        $next->(@args);
+    }
 
-    local $SIG{INT} = sub { die "Interrupted" };
-    $next->(@args);
-}
-
-sub execute {
-    my $self = shift;
-    my ($next, @args) = @_;
-
-    local $SIG{INT} = sub { die "Interrupted" };
-    $next->(@args);
+    method execute ($next, @args) {
+        local $SIG{INT} = sub { die "Interrupted" };
+        $next->(@args);
+    }
 }
 
 1;

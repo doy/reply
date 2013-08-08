@@ -1,9 +1,9 @@
-package Reply::Plugin::Editor;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: command to edit the current line in a text editor
 
-use base 'Reply::Plugin';
+use mop;
 
 use File::HomeDir;
 use File::Spec;
@@ -28,52 +28,50 @@ otherwise it will use the value of C<$ENV{VISUAL}> or C<$ENV{EDITOR}>.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my %opts = @_;
+class Reply::Plugin::Editor extends Reply::Plugin {
+    has $editor;
+    has $current_text = '';
 
-    my $self = $class->SUPER::new(@_);
-    $self->{editor} = Proc::InvokeEditor->new(
-        (defined $opts{editor}
-            ? (editors => [ $opts{editor} ])
-            : ())
-    );
-    $self->{current_text} = '';
-
-    return $self;
-}
-
-sub command_e {
-    my $self = shift;
-    my ($line) = @_;
-
-    my $text;
-    if (length $line) {
-        if ($line =~ s+^~/++) {
-            $line = File::Spec->catfile(File::HomeDir->my_home, $line);
-        }
-        elsif ($line =~ s+^~([^/]*)/++) {
-            $line = File::Spec->catfile(File::HomeDir->users_home($1), $line);
-        }
-
-        my $current_text = do {
-            local $/;
-            if (open my $fh, '<', $line) {
-                <$fh>;
-            }
-            else {
-                warn "Couldn't open $line: $!";
-                return '';
-            }
-        };
-        $text = $self->{editor}->edit($current_text, '.pl');
-    }
-    else {
-        $text = $self->{editor}->edit($self->{current_text}, '.pl');
-        $self->{current_text} = $text;
+    submethod BUILD ($opts) {
+        $editor = Proc::InvokeEditor->new(
+            (defined $opts->{editor}
+                ? (editors => [ $opts->{editor} ])
+                : ())
+        );
     }
 
-    return $text;
+    method command_e ($line) {
+        my $text;
+        if (length $line) {
+            if ($line =~ s+^~/++) {
+                $line = File::Spec->catfile(File::HomeDir->my_home, $line);
+            }
+            elsif ($line =~ s+^~([^/]*)/++) {
+                $line = File::Spec->catfile(
+                    File::HomeDir->users_home($1),
+                    $line,
+                );
+            }
+
+            my $current_text = do {
+                local $/;
+                if (open my $fh, '<', $line) {
+                    <$fh>;
+                }
+                else {
+                    warn "Couldn't open $line: $!";
+                    return '';
+                }
+            };
+            $text = $editor->edit($current_text, '.pl');
+        }
+        else {
+            $text = $editor->edit($current_text, '.pl');
+            $current_text = $text;
+        }
+
+        return $text;
+    }
 }
 
 =for Pod::Coverage

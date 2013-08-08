@@ -1,9 +1,9 @@
-package Reply::Plugin::DataDumper;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: format results using Data::Dumper
 
-use base 'Reply::Plugin';
+use mop;
 
 use Data::Dumper;
 
@@ -18,19 +18,15 @@ This plugin uses L<Data::Dumper> to format results.
 
 =cut
 
-sub new {
-    my $class = shift;
+class Reply::Plugin::DataDumper extends Reply::Plugin {
+    submethod BUILD {
+        $Data::Dumper::Terse = 1;
+        $Data::Dumper::Sortkeys = 1;
+    }
 
-    $Data::Dumper::Terse = 1;
-    $Data::Dumper::Sortkeys = 1;
-
-    return $class->SUPER::new(@_);
-}
-
-sub mangle_result {
-    my $self = shift;
-    my (@result) = @_;
-    return Dumper(@result == 0 ? () : @result == 1 ? $result[0] : \@result);
+    method mangle_result (@result) {
+        return Dumper(@result == 0 ? () : @result == 1 ? $result[0] : \@result);
+    }
 }
 
 1;

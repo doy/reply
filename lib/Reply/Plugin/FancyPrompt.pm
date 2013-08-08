@@ -1,9 +1,9 @@
-package Reply::Plugin::FancyPrompt;
+package main;
 use strict;
 use warnings;
 # ABSTRACT: provides a more informative prompt
 
-use base 'Reply::Plugin';
+use mop;
 
 =head1 SYNOPSIS
 
@@ -18,27 +18,20 @@ current session.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my $self = $class->SUPER::new(@_);
-    $self->{counter} = 0;
-    $self->{prompted} = 0;
-    return $self;
-}
+class Reply::Plugin::FancyPrompt extends Reply::Plugin {
+    has $counter  = 0;
+    has $prompted = 0;
 
-sub prompt {
-    my $self = shift;
-    my ($next) = @_;
-    $self->{prompted} = 1;
-    return $self->{counter} . $next->();
-}
+    method prompt ($next) {
+        $prompted = 1;
+        return $counter . $next->();
+    }
 
-sub loop {
-    my $self = shift;
-    my ($continue) = @_;
-    $self->{counter}++ if $self->{prompted};
-    $self->{prompted} = 0;
-    $continue;
+    method loop ($continue) {
+        $counter++ if $prompted;
+        $prompted = 0;
+        $continue;
+    }
 }
 
 1;
