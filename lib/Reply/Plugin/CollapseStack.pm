@@ -56,7 +56,7 @@ class Reply::Plugin::CollapseStack extends Reply::Plugin {
 
     method command_stack {
         # XXX should use print_error here
-        print($self->{full_error} || "No stack to display.\n");
+        print($full_error || "No stack to display.\n");
         return '';
     }
 }
