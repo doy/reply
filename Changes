@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.33  2013-08-16
       - Support Term::ReadLine::Caroline (tokuhirom, #24)
 
 0.32  2013-07-18
