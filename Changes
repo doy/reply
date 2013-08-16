@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - Support Term::ReadLine::Caroline (tokuhirom, #24)
 
 0.32  2013-07-18
       - Fix test failures if Carp::Always isn't installed (djerius, #21)
