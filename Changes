@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.34  2013-08-29
       - fix running reply without the ReadLine plugin (lestrrat, #26)
 
 0.33  2013-08-16
