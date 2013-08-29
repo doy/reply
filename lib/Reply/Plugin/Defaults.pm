@@ -31,7 +31,7 @@ sub read_line {
     my ($next, $prompt) = @_;
 
     print $prompt;
-    return scalar <>;
+    return scalar <STDIN>;
 }
 
 (my $PREFIX = <<'PREFIX') =~ s/__PACKAGE__/__PACKAGE__/ge;

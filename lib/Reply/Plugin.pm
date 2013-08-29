@@ -68,7 +68,7 @@ implementation returns C<< ">" >>
 
 Called to actually read a line from the user. Takes no arguments, and returns a
 single string. The default implementation uses the C<< <> >> operator to read a
-single line from the user.
+single line from C<STDIN>.
 
 =item command_C<$name> (chained)
 
