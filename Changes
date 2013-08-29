@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - fix running reply without the ReadLine plugin (lestrrat, #26)
 
 0.33  2013-08-16
       - Support Term::ReadLine::Caroline (tokuhirom, #24)
