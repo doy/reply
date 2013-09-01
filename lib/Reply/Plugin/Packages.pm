@@ -29,7 +29,7 @@ class Reply::Plugin::Packages extends Reply::Plugin {
     }
 
     method mangle_line ($line) {
-        my $!package = __PACKAGE__;
+        my $package = __PACKAGE__;
         return <<LINE;
 $line
 ;
