@@ -40,12 +40,12 @@ be relative to the user's home directory, otherwise it will be used as-is.
 =cut
 
 class Reply::Config {
-    has $file   = $_->_canonicalize_file('.replyrc');
-    has $config = Config::INI::Reader::Ordered->new;
+    has $!file   = $_->_canonicalize_file('.replyrc');
+    has $!config = Config::INI::Reader::Ordered->new;
 
     submethod BUILD ($args) {
         if (defined $args->{file}) {
-            $file = $self->_canonicalize_file($args->{file});
+            $!file = $self->_canonicalize_file($args->{file});
         }
     }
 
@@ -55,7 +55,7 @@ Returns the absolute path to the config file that is to be used.
 
 =cut
 
-    method file { $file }
+    method file { $!file }
 
 =method data
 
@@ -63,7 +63,7 @@ Returns the loaded configuration data.
 
 =cut
 
-    method data { $config->read_file($file) }
+    method data { $!config->read_file($!file) }
 
     method _canonicalize_file ($filename) {
         return File::Spec->catfile(

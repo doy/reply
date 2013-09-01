@@ -28,43 +28,43 @@ like [DataDump], etc).
 =cut
 
 class Reply::Plugin::Nopaste extends Reply::Plugin {
-    has $history = '';
-    has $service;
+    has $!history = '';
+    has $!service;
 
-    has $prompt;
-    has $line;
-    has $result;
+    has $!prompt;
+    has $!line;
+    has $!result;
 
     method prompt ($next, @args) {
-        $prompt = $next->(@args);
-        return $prompt;
+        $!prompt = $next->(@args);
+        return $!prompt;
     }
 
     method read_line ($next, @args) {
-        $line = $next->(@args);
-        $line = "$line\n" if defined $line;
-        return $line;
+        $!line = $next->(@args);
+        $!line = "$!line\n" if defined $!line;
+        return $!line;
     }
 
     method print_error ($next, $error) {
-        $result = $error;
+        $!result = $error;
         $next->($error);
     }
 
     method print_result ($next, @result) {
-        $result = @result ? join('', @result) . "\n" : '';
+        $!result = @result ? join('', @result) . "\n" : '';
         $next->(@result);
     }
 
     method loop ($continue) {
-        $history .= "$prompt$line$result"
-            if defined $prompt
-            && defined $line
-            && defined $result;
+        $!history .= "$!prompt$!line$!result"
+            if defined $!prompt
+            && defined $!line
+            && defined $!result;
 
-        undef $prompt;
-        undef $line;
-        undef $result;
+        undef $!prompt;
+        undef $!line;
+        undef $!result;
 
         $continue;
     }
@@ -73,11 +73,11 @@ class Reply::Plugin::Nopaste extends Reply::Plugin {
         $cmd_line = "Reply session" unless length $cmd_line;
 
         print App::Nopaste->nopaste(
-            text => $history,
+            text => $!history,
             desc => $cmd_line,
             lang => 'perl',
-            (defined $service
-                ? (services => [ $service ])
+            (defined $!service
+                ? (services => [ $!service ])
                 : ()),
         ) . "\n";
 
