@@ -24,8 +24,8 @@ value.
 =cut
 
 class Reply::Plugin::DataDump extends Reply::Plugin {
-    has $respect_stringification = 1;
-    has $filter = sub {
+    has $!respect_stringification = 1;
+    has $!filter = sub {
         my ($ctx, $ref) = @_;
         return unless $ctx->is_blessed;
         my $stringify = overload::Method($ref, '""');
@@ -36,11 +36,11 @@ class Reply::Plugin::DataDump extends Reply::Plugin {
     };
 
     submethod BUILD {
-        undef $filter unless $respect_stringification;
+        undef $!filter unless $!respect_stringification;
     }
 
     method mangle_result (@result) {
-        return @result ? dumpf(@result, $filter) : ();
+        return @result ? dumpf(@result, $!filter) : ();
     }
 }
 

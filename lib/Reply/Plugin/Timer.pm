@@ -21,14 +21,14 @@ the default C<mintime> is C<< 0.01 >> seconds.
 =cut
 
 class Reply::Plugin::Timer extends Reply::Plugin {
-    has $mintime = 0.01;
+    has $!mintime = 0.01;
 
     method execute ($next, @args) {
         my $t0 = [gettimeofday];
         my $ret = $next->(@args);
         my $elapsed = tv_interval($t0);
 
-        if ($elapsed > $mintime) {
+        if ($elapsed > $!mintime) {
             if ($elapsed >= 1) {
                 printf "Execution Time: %0.3fs\n", $elapsed
             } else {

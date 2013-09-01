@@ -19,17 +19,17 @@ current session.
 =cut
 
 class Reply::Plugin::FancyPrompt extends Reply::Plugin {
-    has $counter  = 0;
-    has $prompted = 0;
+    has $!counter  = 0;
+    has $!prompted = 0;
 
     method prompt ($next) {
-        $prompted = 1;
-        return $counter . $next->();
+        $!prompted = 1;
+        return $!counter . $next->();
     }
 
     method loop ($continue) {
-        $counter++ if $prompted;
-        $prompted = 0;
+        $!counter++ if $!prompted;
+        $!prompted = 0;
         $continue;
     }
 }

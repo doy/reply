@@ -30,9 +30,9 @@ lines (at least until C<no strict> is given).
 =cut
 
 class Reply::Plugin::Hints extends Reply::Plugin {
-    has $hints        = $default_hints;
-    has $hinthash     = $default_hinthash;
-    has $warning_bits = $default_warning_bits;
+    has $!hints        = $default_hints;
+    has $!hinthash     = $default_hinthash;
+    has $!warning_bits = $default_warning_bits;
 
     method mangle_line ($line) {
         my $package = __PACKAGE__;
@@ -56,15 +56,15 @@ LINE
         # XXX it'd be nice to avoid using globals here, but we can't use
         # eval_closure's environment parameter since we need to access the
         # information in a BEGIN block
-        our $HINTS        = $hints;
-        our $HINTHASH     = $hinthash;
-        our $WARNING_BITS = $warning_bits;
+        our $HINTS        = $!hints;
+        our $HINTHASH     = $!hinthash;
+        our $WARNING_BITS = $!warning_bits;
 
         my @result = $next->($line, %args);
 
-        $hints        = $HINTS;
-        $hinthash     = $HINTHASH;
-        $warning_bits = $WARNING_BITS;
+        $!hints        = $HINTS;
+        $!hinthash     = $HINTHASH;
+        $!warning_bits = $WARNING_BITS;
 
         return @result;
     }

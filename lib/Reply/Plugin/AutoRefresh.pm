@@ -30,10 +30,10 @@ modules correctly see the global override.
 =cut
 
 class Reply::Plugin::AutoRefresh extends Reply::Plugin {
-    has $track_require = 1;
+    has $!track_require = 1;
 
     submethod BUILD {
-        Class::Refresh->import(track_require => $track_require);
+        Class::Refresh->import(track_require => $!track_require);
 
         # so that when we load things after this plugin, they get a copy of
         # Module::Runtime which has the call to require() rebound to our

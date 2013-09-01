@@ -33,9 +33,9 @@ C<result> options.
 =cut
 
 class Reply::Plugin::Colors extends Reply::Plugin {
-    has $error_color   = 'red';
-    has $warning_color = 'yellow';
-    has $result_color  = 'green';
+    has $!error_color   = 'red';
+    has $!warning_color = 'yellow';
+    has $!result_color  = 'green';
 
     method compile ($next, @args) {
         local $SIG{__WARN__} = sub { $self->print_warn(@_) };
@@ -48,21 +48,21 @@ class Reply::Plugin::Colors extends Reply::Plugin {
     }
 
     method print_error ($next, $error) {
-        print color($error_color);
+        print color($!error_color);
         $next->($error);
         local $| = 1;
         print color('reset');
     }
 
     method print_result ($next, @result) {
-        print color($result_color);
+        print color($!result_color);
         $next->(@result);
         local $| = 1;
         print color('reset');
     }
 
     method print_warn ($warning) {
-        print color($warning_color);
+        print color($!warning_color);
         print $warning;
         local $| = 1;
         print color('reset');

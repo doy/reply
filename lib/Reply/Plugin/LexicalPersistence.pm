@@ -21,7 +21,7 @@ then use C<$x> as expected in subsequent lines.
 =cut
 
 class Reply::Plugin::LexicalPersistence extends Reply::Plugin {
-    has $env = {};
+    has $!env = {};
 
     method compile ($next, $line, %args) {
         my ($code) = $next->($line, %args);
@@ -29,12 +29,12 @@ class Reply::Plugin::LexicalPersistence extends Reply::Plugin {
         my $new_env = peek_sub($code);
         delete $new_env->{$_} for keys %{ closed_over($code) };
 
-        $env = { %$env, %$new_env };
+        $!env = { %{$!env}, %$new_env };
 
         return $code;
     }
 
-    method lexical_environment { $env }
+    method lexical_environment { $!env }
 }
 
 1;
