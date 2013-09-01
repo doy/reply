@@ -171,7 +171,7 @@ messages you want to communicate.
 =cut
 
 class Reply::Plugin is closed, repr('HASH') {
-    has $publisher = die "publisher is required";
+    has $!publisher = die "publisher is required";
 
 =method publish ($name, @args)
 
@@ -182,7 +182,7 @@ the parameters. Returns a list of everything that each plugin responded with.
 =cut
 
     method publish ($method, @args) {
-        $publisher->($method, @args);
+        $!publisher->($method, @args);
     }
 
 =method commands

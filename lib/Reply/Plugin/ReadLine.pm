@@ -34,67 +34,67 @@ recommended if possible.
 =cut
 
 class Reply::Plugin::ReadLine extends Reply::Plugin {
-    has $term           = Term::ReadLine->new('Reply');
-    has $history_file   = '.reply_history';
-    has $history_length = -1;
+    has $!term           = Term::ReadLine->new('Reply');
+    has $!history_file   = '.reply_history';
+    has $!history_length = -1;
 
     # XXX these should be able to be lazy, but defaults can't see attributes
     # yet it seems
-    has $rl_gnu;
-    has $rl_perl5;
+    has $!rl_gnu;
+    has $!rl_perl5;
 
     submethod BUILD ($opts) {
-        $rl_gnu   = $term->ReadLine eq 'Term::ReadLine::Gnu';
-        $rl_perl5 = $term->ReadLine eq 'Term::ReadLine::Perl5';
+        $!rl_gnu   = $!term->ReadLine eq 'Term::ReadLine::Gnu';
+        $!rl_perl5 = $!term->ReadLine eq 'Term::ReadLine::Perl5';
 
-        $history_file = File::Spec->catfile(
-            (File::Spec->file_name_is_absolute($history_file)
+        $!history_file = File::Spec->catfile(
+            (File::Spec->file_name_is_absolute($!history_file)
                 ? ()
                 : (File::HomeDir->my_data)),
-            $history_file
+            $!history_file
         );
 
-        if ($rl_perl5) {
+        if ($!rl_perl5) {
             # output compatible with Term::ReadLine::Gnu
             $readline::rl_scroll_nextline = 0;
         }
 
-        if ($rl_perl5 || $rl_gnu) {
-            $term->StifleHistory($history_length)
-                if $history_length >= 0;
+        if ($!rl_perl5 || $!rl_gnu) {
+            $!term->StifleHistory($!history_length)
+                if $!history_length >= 0;
         }
 
-        if (open my $fh, '<', $history_file) {
+        if (open my $fh, '<', $!history_file) {
             for my $line (<$fh>) {
                 chomp $line;
-                $term->addhistory($line);
+                $!term->addhistory($line);
             }
         }
         else {
             my $e = $!;
-            warn "Couldn't open $history_file for reading: $e"
-                if -e $history_file;
+            warn "Couldn't open $!history_file for reading: $e"
+                if -e $!history_file;
         }
 
         $self->_register_tab_complete;
     }
 
     method read_line ($next, $prompt) {
-        $term->readline($prompt);
+        $!term->readline($prompt);
     }
 
     submethod DEMOLISH {
-        return if $history_length == 0;
-        return unless $rl_gnu || $rl_perl5;
-        $term->WriteHistory($history_file)
-            or warn "Couldn't write history to $history_file";
+        return if $!history_length == 0;
+        return unless $!rl_gnu || $!rl_perl5;
+        $!term->WriteHistory($!history_file)
+            or warn "Couldn't write history to $!history_file";
     }
 
     method _register_tab_complete {
         weaken(my $weakself = $self);
 
-        if ($rl_gnu) {
-            $term->Attribs->{attempted_completion_function} = sub {
+        if ($!rl_gnu) {
+            $!term->Attribs->{attempted_completion_function} = sub {
                 my ($text, $line, $start, $end) = @_;
 
                 # discard everything after the cursor for completion purposes
@@ -103,15 +103,15 @@ class Reply::Plugin::ReadLine extends Reply::Plugin {
                 my @matches = $weakself->publish('tab_handler', $line);
                 my $match_index = 0;
 
-                return $term->completion_matches($text, sub {
+                return $!term->completion_matches($text, sub {
                     my ($text, $index) = @_;
                     return $matches[$index];
                 });
             };
         }
 
-        if ($rl_perl5) {
-            $term->Attribs->{completion_function} = sub {
+        if ($!rl_perl5) {
+            $!term->Attribs->{completion_function} = sub {
                 my ($text, $line, $start) = @_;
                 my $end = $start + length($text);
 

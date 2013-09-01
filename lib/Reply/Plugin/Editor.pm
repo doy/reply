@@ -29,11 +29,11 @@ otherwise it will use the value of C<$ENV{VISUAL}> or C<$ENV{EDITOR}>.
 =cut
 
 class Reply::Plugin::Editor extends Reply::Plugin {
-    has $editor;
-    has $current_text = '';
+    has $!editor;
+    has $!current_text = '';
 
     submethod BUILD ($opts) {
-        $editor = Proc::InvokeEditor->new(
+        $!editor = Proc::InvokeEditor->new(
             (defined $opts->{editor}
                 ? (editors => [ $opts->{editor} ])
                 : ())
@@ -53,7 +53,7 @@ class Reply::Plugin::Editor extends Reply::Plugin {
                 );
             }
 
-            my $current_text = do {
+            my $!current_text = do {
                 local $/;
                 if (open my $fh, '<', $line) {
                     <$fh>;
@@ -63,11 +63,11 @@ class Reply::Plugin::Editor extends Reply::Plugin {
                     return '';
                 }
             };
-            $text = $editor->edit($current_text, '.pl');
+            $text = $!editor->edit($!current_text, '.pl');
         }
         else {
-            $text = $editor->edit($current_text, '.pl');
-            $current_text = $text;
+            $text = $!editor->edit($!current_text, '.pl');
+            $!current_text = $text;
         }
 
         return $text;

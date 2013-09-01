@@ -24,7 +24,7 @@ BEGIN {
 PREFIX
 
 class Reply::Plugin::Defaults extends Reply::Plugin {
-    has $quit = 0;
+    has $!quit = 0;
 
     method prompt { "> " }
 
@@ -63,12 +63,12 @@ class Reply::Plugin::Defaults extends Reply::Plugin {
     }
 
     method command_q {
-        $quit = 1;
+        $!quit = 1;
         return '';
     }
 
     method loop ($continue) {
-        $continue = 0 if $quit;
+        $continue = 0 if $!quit;
         $continue;
     }
 }

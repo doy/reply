@@ -80,8 +80,8 @@ An arrayref of additional plugins to load.
 =cut
 
 class Reply {
-    has $plugins = [];
-    has $_default_plugin = $_->_instantiate_plugin('Defaults');
+    has $!plugins = [];
+    has $!_default_plugin = $_->_instantiate_plugin('Defaults');
 
     submethod BUILD ($opts) {
         if (defined $opts->{config}) {
@@ -170,7 +170,7 @@ requested to quit.
     method _load_plugin ($plugin, $opts) {
         $plugin = $self->_instantiate_plugin($plugin, $opts);
 
-        push @$plugins, $plugin;
+        push @{$!plugins}, $plugin;
     }
 
     method _instantiate_plugin ($plugin, $opts) {
@@ -193,7 +193,7 @@ requested to quit.
     }
 
     method _plugins {
-        return (@$plugins, $_default_plugin);
+        return (@{$!plugins}, $!_default_plugin);
     }
 
     method _read {
@@ -239,11 +239,11 @@ requested to quit.
         # XXX $self should be available in parameter defaults too
         $plugins //= [ $self->_plugins ];
 
-        $plugins = [ grep { $_->can($method) } @$plugins ];
+        $plugins = [ grep { $_->can($method) } @{$plugins} ];
 
-        return @$args unless @$plugins;
+        return @$args unless @{$plugins};
 
-        my $plugin = shift @$plugins;
+        my $plugin = shift @{$plugins};
         my $next = sub { $self->_wrapped_plugin($method, [@_], $plugins) };
 
         return $plugin->$method($next, @$args);
@@ -253,9 +253,9 @@ requested to quit.
         # XXX $self should be available in parameter defaults too
         $plugins //= [ $self->_plugins ];
 
-        $plugins = [ grep { $_->can($method) } @$plugins ];
+        $plugins = [ grep { $_->can($method) } @{$plugins} ];
 
-        for my $plugin (@$plugins) {
+        for my $plugin (@{$plugins}) {
             @$args = $plugin->$method(@$args);
         }
 
@@ -266,11 +266,11 @@ requested to quit.
         # XXX $self should be available in parameter defaults too
         $plugins //= [ $self->_plugins ];
 
-        $plugins = [ grep { $_->can($method) } @$plugins ];
+        $plugins = [ grep { $_->can($method) } @{$plugins} ];
 
         my @results;
 
-        for my $plugin (@$plugins) {
+        for my $plugin (@{$plugins}) {
             push @results, $plugin->$method(@$args);
         }
 

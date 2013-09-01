@@ -21,10 +21,10 @@ initial package to use when Reply starts up.
 =cut
 
 class Reply::Plugin::Packages extends Reply::Plugin {
-    has $package = 'main';
+    has $!package = 'main';
 
     submethod BUILD ($args) {
-        $package = $args->{default_package}
+        $!package = $args->{default_package}
             if defined $args->{default_package};
     }
 
@@ -45,12 +45,12 @@ LINE
         # XXX it'd be nice to avoid using globals here, but we can't use
         # eval_closure's environment parameter since we need to access the
         # information in a BEGIN block
-        $package = our $PACKAGE;
+        $!package = our $PACKAGE;
 
         return @result;
     }
 
-    method package { $package }
+    method package { $!package }
 }
 
 1;

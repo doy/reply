@@ -27,9 +27,9 @@ the C<num_lines> option.
 =cut
 
 class Reply::Plugin::CollapseStack extends Reply::Plugin {
-    has $num_lines = 1;
+    has $!num_lines = 1;
 
-    has $full_error;
+    has $!full_error;
 
     method compile ($next, @args) {
         local $SIG{__DIE__} = \&Carp::Always::_die;
@@ -42,11 +42,11 @@ class Reply::Plugin::CollapseStack extends Reply::Plugin {
     }
 
     method mangle_error ($error) {
-        $full_error = $error;
+        $!full_error = $error;
 
         my @lines = split /\n/, $error;
-        if (@lines > $num_lines) {
-            splice @lines, $num_lines;
+        if (@lines > $!num_lines) {
+            splice @lines, $!num_lines;
             $error = join "\n", @lines,
                                 "    (Run #stack to see the full trace)\n";
         }
@@ -56,7 +56,7 @@ class Reply::Plugin::CollapseStack extends Reply::Plugin {
 
     method command_stack {
         # XXX should use print_error here
-        print($full_error || "No stack to display.\n");
+        print($!full_error || "No stack to display.\n");
         return '';
     }
 }

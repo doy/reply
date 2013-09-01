@@ -22,16 +22,16 @@ include an indication of where the value is stored, for later reference.
 =cut
 
 class Reply::Plugin::ResultCache extends Reply::Plugin {
-    has $results = [];
-    has $variable = 'res';
+    has $!results = [];
+    has $!variable = 'res';
 
     method execute ($next, @args) {
         my @res = $next->(@args);
         if (@res == 1) {
-            push @$results, $res[0];
+            push @{$!results}, $res[0];
         }
         elsif (@res > 1) {
-            push @$results, \@res;
+            push @{$!results}, \@res;
         }
 
         return @res;
@@ -39,11 +39,11 @@ class Reply::Plugin::ResultCache extends Reply::Plugin {
 
     method mangle_result ($result) {
         return unless defined $result;
-        return '$' . $variable . '[' . $#$results . '] = ' . $result;
+        return '$' . $!variable . '[' . $#{$!results} . '] = ' . $result;
     }
 
     method lexical_environment {
-        return { "\@$variable" => [ @$results ] };
+        return { "\@$!variable" => [ @{$!results} ] };
     }
 }
 
