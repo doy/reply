@@ -53,7 +53,7 @@ class Reply::Plugin::Editor extends Reply::Plugin {
                 );
             }
 
-            my $!current_text = do {
+            my $current_text = do {
                 local $/;
                 if (open my $fh, '<', $line) {
                     <$fh>;
@@ -63,7 +63,7 @@ class Reply::Plugin::Editor extends Reply::Plugin {
                     return '';
                 }
             };
-            $text = $!editor->edit($!current_text, '.pl');
+            $text = $!editor->edit($current_text, '.pl');
         }
         else {
             $text = $!editor->edit($!current_text, '.pl');
