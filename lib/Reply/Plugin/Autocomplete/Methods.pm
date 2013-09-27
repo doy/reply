@@ -31,7 +31,7 @@ class Reply::Plugin::Autocomplete::Methods extends Reply::Plugin {
 
         $method_prefix = '' unless defined $method_prefix;
 
-        my $klass;
+        my $class;
         if ($invocant =~ /^\$/) {
             # XXX should support globals here
             my $env = {
@@ -39,14 +39,14 @@ class Reply::Plugin::Autocomplete::Methods extends Reply::Plugin {
             };
             my $var = $env->{$invocant};
             return unless $var && ref($var) eq 'REF' && blessed($$var);
-            $klass = blessed($$var);
+            $class = blessed($$var);
         }
         else {
-            $klass = $invocant;
+            $class = $invocant;
         }
 
         my @results;
-        for my $method (methods($klass)) {
+        for my $method (methods($class)) {
             push @results, $method if index($method, $method_prefix) == 0;
         }
 
