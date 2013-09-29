@@ -35,7 +35,7 @@ sub execute {
     my ($self, $next, @args) = @_;
 
     my $t0 = [gettimeofday];
-    my $ret = $next->(@args);
+    my @ret = $next->(@args);
     my $elapsed = tv_interval($t0);
 
     if ($elapsed > $self->{mintime}) {
@@ -46,7 +46,7 @@ sub execute {
         }
     }
 
-    return $ret;
+    return @ret;
 }
 
 1;
