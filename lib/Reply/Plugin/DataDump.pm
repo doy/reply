@@ -35,7 +35,7 @@ class Reply::Plugin::DataDump extends Reply::Plugin {
         };
     };
 
-    submethod BUILD {
+    method BUILD {
         undef $!filter unless $!respect_stringification;
     }
 

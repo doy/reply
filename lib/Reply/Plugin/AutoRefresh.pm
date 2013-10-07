@@ -32,7 +32,7 @@ modules correctly see the global override.
 class Reply::Plugin::AutoRefresh extends Reply::Plugin {
     has $!track_require = 1;
 
-    submethod BUILD {
+    method BUILD {
         Class::Refresh->import(track_require => $!track_require);
 
         # so that when we load things after this plugin, they get a copy of

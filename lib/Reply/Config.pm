@@ -43,7 +43,7 @@ class Reply::Config {
     has $!file   = $_->_canonicalize_file('.replyrc');
     has $!config = Config::INI::Reader::Ordered->new;
 
-    submethod BUILD ($args) {
+    method BUILD ($args) {
         if (defined $args->{file}) {
             $!file = $self->_canonicalize_file($args->{file});
         }

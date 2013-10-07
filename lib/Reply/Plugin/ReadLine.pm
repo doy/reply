@@ -44,7 +44,7 @@ class Reply::Plugin::ReadLine extends Reply::Plugin {
     has $!rl_perl5;
     has $!rl_caroline;
 
-    submethod BUILD ($opts) {
+    method BUILD ($opts) {
         $!rl_gnu      = $!term->ReadLine eq 'Term::ReadLine::Gnu';
         $!rl_perl5    = $!term->ReadLine eq 'Term::ReadLine::Perl5';
         $!rl_caroline = $!term->ReadLine eq 'Term::ReadLine::Caroline';
@@ -85,7 +85,7 @@ class Reply::Plugin::ReadLine extends Reply::Plugin {
         $!term->readline($prompt);
     }
 
-    submethod DEMOLISH {
+    method DEMOLISH {
         return if $!history_length == 0;
         return unless $!rl_gnu || $!rl_perl5;
         $!term->WriteHistory($!history_file)

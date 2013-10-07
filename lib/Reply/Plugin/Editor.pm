@@ -32,7 +32,7 @@ class Reply::Plugin::Editor extends Reply::Plugin {
     has $!editor;
     has $!current_text = '';
 
-    submethod BUILD ($opts) {
+    method BUILD ($opts) {
         $!editor = Proc::InvokeEditor->new(
             (defined $opts->{editor}
                 ? (editors => [ $opts->{editor} ])

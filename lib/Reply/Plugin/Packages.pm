@@ -23,7 +23,7 @@ initial package to use when Reply starts up.
 class Reply::Plugin::Packages extends Reply::Plugin {
     has $!package = 'main';
 
-    submethod BUILD ($args) {
+    method BUILD ($args) {
         $!package = $args->{default_package}
             if defined $args->{default_package};
     }

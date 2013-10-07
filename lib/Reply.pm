@@ -83,7 +83,7 @@ class Reply {
     has $!plugins = [];
     has $!_default_plugin = $_->_instantiate_plugin('Defaults');
 
-    submethod BUILD ($opts) {
+    method BUILD ($opts) {
         if (defined $opts->{config}) {
             if (!ref($opts->{config})) {
                 $opts->{config} = Reply::Config->new(file => $opts->{config});

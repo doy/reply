@@ -19,7 +19,7 @@ This plugin uses L<Data::Dumper> to format results.
 =cut
 
 class Reply::Plugin::DataDumper extends Reply::Plugin {
-    submethod BUILD {
+    method BUILD {
         $Data::Dumper::Terse = 1;
         $Data::Dumper::Sortkeys = 1;
     }
