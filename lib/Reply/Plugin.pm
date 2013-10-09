@@ -170,7 +170,7 @@ messages you want to communicate.
 
 =cut
 
-class Reply::Plugin is closed, repr('HASH') {
+class Reply::Plugin is repr('HASH') {
     has $!publisher = die "publisher is required";
 
 =method publish ($name, @args)
