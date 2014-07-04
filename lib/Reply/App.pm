@@ -92,15 +92,8 @@ sub run {
 
     my $reply = Reply->new(%args);
     $reply->step("use $_") for @modules;
-    for my $line (@script_lines) {
-        print $reply->_wrapped_plugin('prompt'), $line, "\n";
-        $reply->step($line);
-    }
-    for my $file (@argv) {
-        my $line = 'do "' . quotemeta($file) . '"';
-        print $reply->_wrapped_plugin('prompt'), $line, "\n";
-        $reply->step($line);
-    }
+    $reply->step($_, 1) for @script_lines;
+    $reply->step('do "' . quotemeta($_) . '"', 1) for @files;
     $reply->run;
 
     return 0;
