@@ -42,7 +42,7 @@ sub run {
 
     my $cfgfile = '.replyrc';
     my $exitcode;
-    my @modules;
+    my (@modules, @script_lines);
     my $parsed = GetOptionsFromArray(
         \@argv,
         'cfg:s'   => \$cfgfile,
@@ -50,6 +50,7 @@ sub run {
         'b|blib'  => sub { push @INC, 'blib/lib', 'blib/arch' },
         'I:s@'    => sub { push @INC, $_[1] },
         'M:s@'    => \@modules,
+        'e:s@'    => \@script_lines,
         'version' => sub { $exitcode = 0; version() },
         'help'    => sub { $exitcode = 0; usage() },
     );
@@ -84,6 +85,10 @@ sub run {
 
     my $reply = Reply->new(%args);
     $reply->step("use $_") for @modules;
+    for my $line (@script_lines) {
+        print $reply->_wrapped_plugin('prompt'), $line, "\n";
+        $reply->step($line);
+    }
     $reply->run;
 
     return 0;
