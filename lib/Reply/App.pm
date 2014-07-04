@@ -42,7 +42,7 @@ sub run {
 
     my $cfgfile = '.replyrc';
     my $exitcode;
-    my (@modules, @script_lines);
+    my (@modules, @script_lines, @files);
     my $parsed = GetOptionsFromArray(
         \@argv,
         'cfg:s'   => \$cfgfile,
@@ -54,6 +54,13 @@ sub run {
         'version' => sub { $exitcode = 0; version() },
         'help'    => sub { $exitcode = 0; usage() },
     );
+
+    @files = @argv;
+    for my $file (@files) {
+        if (!stat $file) {
+            die "Can't read $file: $!";
+        }
+    }
 
     if (!$parsed) {
         usage(1);
@@ -86,6 +93,11 @@ sub run {
     my $reply = Reply->new(%args);
     $reply->step("use $_") for @modules;
     for my $line (@script_lines) {
+        print $reply->_wrapped_plugin('prompt'), $line, "\n";
+        $reply->step($line);
+    }
+    for my $file (@argv) {
+        my $line = 'do "' . quotemeta($file) . '"';
         print $reply->_wrapped_plugin('prompt'), $line, "\n";
         $reply->step($line);
     }
