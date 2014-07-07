@@ -5,8 +5,9 @@ use warnings;
 
 use base 'Reply::Plugin';
 
-use Package::Stash;
 use Scalar::Util 'blessed';
+
+use Reply::Util qw($ident_rx $fq_ident_rx $fq_varname_rx methods);
 
 =head1 SYNOPSIS
 
@@ -21,62 +22,37 @@ code.
 
 =cut
 
-sub new {
-    my $class = shift;
-
-    my $self = $class->SUPER::new(@_);
-    $self->{env} = {};
-    $self->{package} = 'main';
-
-    return $self;
-}
-
-sub lexical_environment {
-    my $self = shift;
-    my ($name, $env) = @_;
-
-    $self->{env}{$name} = $env;
-}
-
-sub package {
-    my $self = shift;
-    my ($package) = @_;
-
-    $self->{package} = $package;
-}
-
 sub tab_handler {
     my $self = shift;
     my ($line) = @_;
 
-    my ($invocant, $method) = $line =~ /((?:\$\s*)?[A-Z_a-z][0-9A-Z_a-z:]*)->([A-Z_a-z][0-9A-Z_a-z]*)?$/;
-    return unless $method;
+    my ($invocant, $method_prefix) = $line =~ /($fq_varname_rx|$fq_ident_rx)->($ident_rx)?$/;
+    return unless $invocant;
+    # XXX unicode
+    return unless $invocant =~ /^[\$A-Z_a-z]/;
 
-    my $package;
+    $method_prefix = '' unless defined $method_prefix;
+
+    my $class;
     if ($invocant =~ /^\$/) {
+        # XXX should support globals here
         my $env = {
-            (map { %$_ } values %{ $self->{env} }),
-            (%{ $self->{env}{defaults} || {} }),
+            map { %$_ } $self->publish('lexical_environment'),
         };
         my $var = $env->{$invocant};
         return unless $var && ref($var) eq 'REF' && blessed($$var);
-        $package = blessed($$var);
+        $class = blessed($$var);
     }
     else {
-        $package = $invocant;
+        $class = $invocant;
     }
-
-    my $stash = eval { Package::Stash->new($package) };
-    return unless $stash;
 
     my @results;
-    for my $stash_method ($stash->list_all_symbols('CODE')) {
-        next unless index($stash_method, $method) == 0;
-
-        push @results, $stash_method;
+    for my $method (methods($class)) {
+        push @results, $method if index($method, $method_prefix) == 0;
     }
 
-    return @results;
+    return sort @results;
 }
 
 1;

@@ -3,6 +3,8 @@ use strict;
 use warnings;
 # ABSTRACT: base class for Reply plugins
 
+use Reply::Util 'methods';
+
 =head1 SYNOPSIS
 
   package Reply::Plugin::Foo;
@@ -22,24 +24,33 @@ methods as necessary to implement their functionality (although the more
 callbacks a given plugin implements, the more likely it is that the plugin may
 be more useful as multiple independent plugins).
 
-Callback methods have two potential calling conventions:
+Callback methods have three potential calling conventions:
 
 =over 4
 
 =item wrapped
 
-Wrapped plugins receive a coderef as their first argument (before any arguments
-to the callback itself), and that coderef can be used to call the next callback
-in the list (if more than one plugin implements a given callback). In
-particular, this allows calling the next plugin multiple times, or not at all
-if necessary. Wrapped plugins should always call their coderef in list context.
-All plugins listed below are wrapped plugins unless indicated otherwise.
+Wrapped callbacks receive a coderef as their first argument (before any
+arguments to the callback itself), and that coderef can be used to call the
+next callback in the list (if more than one plugin implements a given
+callback). In particular, this allows calling the next plugin multiple times,
+or not at all if necessary. Wrapped plugins should always call their coderef in
+list context. All plugins listed below are wrapped plugins unless indicated
+otherwise.
 
 =item chained
 
-Chained plugins receive a list of arguments, and return a new list of arguments
-which will be passed to the next plugin in the chain. This allows each plugin a
-chance to modify a value before it's actually used by the repl.
+Chained callbacks receive a list of arguments, and return a new list of
+arguments which will be passed to the next plugin in the chain. This allows
+each plugin a chance to modify a value before it's actually used by the repl.
+
+=item concatenate
+
+Concatenate callbacks receive a list of arguments, and return a list of
+response values. Each plugin that implements the given callback will be called
+with the same arguments, and the results will be concatenated together into a
+single list, which will be returned. Callbacks for published messages are of
+this type.
 
 =back
 
@@ -57,7 +68,7 @@ implementation returns C<< ">" >>
 
 Called to actually read a line from the user. Takes no arguments, and returns a
 single string. The default implementation uses the C<< <> >> operator to read a
-single line from the user.
+single line from C<STDIN>.
 
 =item command_C<$name> (chained)
 
@@ -133,23 +144,22 @@ Plugins can publish this message when they want to attempt tab completion.
 Plugins that respond to this message should return a list of potential
 completions of the line which is passed in.
 
-=item lexical_environment ($name, $env)
+=item lexical_environment
 
-Plugins which wish to modify the lexical environment should do so by publishing
-this message. This will register it with the repl itself, as well as allowing
-other plugins which introspect the lexical environment to see it.
+Plugins which wish to modify the lexical environment should do so by
+implementing this message, which should return a hashref of variable names
+(including sigils) to value references. There can be more than one lexical
+environment (each maintained by a different plugin), so plugins that wish to
+inspect the lexical environment should do so by calling
+C<< $self->publish('lexical_environment') >>, and then merging together all of
+the hashrefs which are returned.
 
-There can be more than one lexical environment, which are all merged together
-when the line is evaluated. C<default> is the primary environment (typically
-corresponding to the user's code). All other environments should typically have
-unique names, and are used to add additonal variables to the environment that
-won't be overridden if a plugin decides to replace the default environment.
-
-=item package ($name)
+=item package
 
 Plugins which wish to modify the currently active package should do so by
-publishing this message. This will register it with the repl itself, as well as
-allowing other plugins which introspect the current package to see it.
+implementing this message, which should return the name of the current package.
+Then, to access the currently active package, a plugin can call
+C<< ($self->publish('package'))[-1] >>.
 
 =back
 
@@ -181,6 +191,21 @@ sub publish {
     my $self = shift;
 
     $self->{publisher}->(@_);
+}
+
+=method commands
+
+Returns the names of the C<#> commands that this plugin implements. This can
+be used in conjunction with C<publish> - C<< $plugin->publish('commands') >>
+will return a list of all commands which are available in the current Reply
+session.
+
+=cut
+
+sub commands {
+    my $self = shift;
+
+    return map { s/^command_//; $_ } grep { /^command_/ } methods($self);
 }
 
 =for Pod::Coverage

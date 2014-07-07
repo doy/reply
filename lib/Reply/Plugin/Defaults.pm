@@ -13,15 +13,13 @@ use warnings;
 
 use base 'Reply::Plugin';
 
-use Eval::Closure;
+use Eval::Closure 0.11;
 
 sub new {
     my $class = shift;
 
     my $self = $class->SUPER::new(@_);
     $self->{quit} = 0;
-    $self->{env} = {};
-    $self->{package} = 'main';
 
     return $self;
 }
@@ -33,7 +31,7 @@ sub read_line {
     my ($next, $prompt) = @_;
 
     print $prompt;
-    return scalar <>;
+    return scalar <STDIN>;
 }
 
 (my $PREFIX = <<'PREFIX') =~ s/__PACKAGE__/__PACKAGE__/ge;
@@ -48,32 +46,20 @@ sub compile {
     my $self = shift;
     my ($next, $line, %args) = @_;
 
-    my $default_env = delete $self->{env}{default} || {};
-    my $env = {
-        (map { %$_ } values %{ $self->{env} }),
-        %$default_env,
-    };
+    my $env     = { map { %$_ } $self->publish('lexical_environment') };
+    my $package = ($self->publish('package'))[-1];
 
-    my $prefix = "package $self->{package};\n$PREFIX";
+    my $prefix = "package $package;\n$PREFIX";
 
-    return eval_closure(
+    my $code = eval_closure(
         source      => "sub {\n$prefix;\n$line\n}",
         terse_error => 1,
+        alias       => 1,
         environment => $env,
         %args,
     );
-}
 
-sub lexical_environment {
-    my $self = shift;
-    my ($name, $env) = @_;
-    $self->{env}{$name} = $env;
-}
-
-sub package {
-    my $self = shift;
-    my ($package) = @_;
-    $self->{package} = $package;
+    return $code;
 }
 
 sub execute {

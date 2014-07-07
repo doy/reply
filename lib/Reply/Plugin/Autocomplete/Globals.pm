@@ -7,6 +7,8 @@ use base 'Reply::Plugin';
 
 use Package::Stash;
 
+use Reply::Util qw($fq_ident_rx $fq_varname_rx);
+
 =head1 SYNOPSIS
 
   ; .replyrc
@@ -32,7 +34,7 @@ sub tab_handler {
     my $self = shift;
     my ($line) = @_;
 
-    my ($maybe_var) = $line =~ /([\$\@\%\&\*]\s*[0-9A-Z_a-z:]*)$/;
+    my ($maybe_var) = $line =~ /($fq_varname_rx)$/;
     return unless $maybe_var;
     $maybe_var =~ s/\s+//g;
 
@@ -40,9 +42,10 @@ sub tab_handler {
 
     my @parts = split '::', $rest, -1;
     return if grep { /:/ } @parts;
-    return if $parts[0] =~ /^[0-9]/;
+    return if @parts && $parts[0] =~ /^[0-9]/;
 
     my $var_prefix = pop @parts;
+    $var_prefix = '' unless defined $var_prefix;
 
     my $stash_name = join('::', @parts);
     my $stash = eval {
@@ -83,6 +86,14 @@ sub _recursive_symbols {
 
     my @symbols;
     for my $name ($stash->list_all_symbols) {
+        # main can have things in it like "_<reader Foo::bar (defined at ...)"
+        # which aren't real variables - don't complete them, because we only
+        # care about things that can be used as literal variable names. be sure
+        # to not also block out punctuation variables.
+        # XXX fix for unicode
+        # XXX fix for variables like ${^GLOBAL_PHASE}
+        next unless $name =~ /^$fq_ident_rx(?:::)?$/ || length($name) == 1;
+
         if ($name =~ s/::$//) {
             my $next = Package::Stash->new(join('::', $stash_name, $name));
             next if $next->namespace == $stash->namespace;

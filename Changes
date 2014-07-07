@@ -2,6 +2,72 @@ Revision history for Reply
 
 {{$NEXT}}
 
+0.35  2014-07-04
+      - allow executing snippets and files from the argument list (suggested by
+        tobyink, #36)
+
+0.34  2013-08-29
+      - fix running reply without the ReadLine plugin (lestrrat, #26)
+
+0.33  2013-08-16
+      - Support Term::ReadLine::Caroline (tokuhirom, #24)
+
+0.32  2013-07-18
+      - Fix test failures if Carp::Always isn't installed (djerius, #21)
+      - Clarify ReadLine documentation about the location of the history file
+        (Kosuke Asami)
+
+0.31  2013-07-18
+      - fix a ReadLine bug introduced in the previous release (Kosuke Asami,
+        #22)
+
+0.30  2013-07-17
+      - better support for Term::ReadLine::Perl5 (Kosuke Asami, #20)
+
+0.29  2013-07-10
+      - Make CollapseStack always run under Carp::Always (#13)
+      - Fix lexical subs (#19)
+
+0.28  2013-07-10
+      - remove accidentally added dep on 'mro', which doesn't exist on 5.8
+
+0.27  2013-07-10
+      - Add completion plugin for #-commands (#18)
+      - More completion edge case fixes
+      - More internal refactorings
+
+0.26  2013-07-08
+      - Let Data::Printer handle coloring in the DataPrinter plugin. (Sawyer X)
+      - Add a CollapseStack plugin, to make working with large stack traces
+        easier. (sartak)
+
+0.25  2013-07-05
+      - The DataDump plugin now respects object stringification overloads by
+        default. This behavior can be disabled by setting the
+        'respect_stringification' option to 0.
+
+0.24  2013-07-04
+      - use Devel::LexAlias to ensure that the lexical environment is persisted
+        properly (gh #10)
+      - a few internal refactorings
+
+0.23  2013-07-03
+      - use the correct #! line (reported by SREZIC, RT86669)
+
+0.22  2013-07-02
+      - few more completion edge cases
+
+0.21  2013-07-01
+      - check inheritance in method completions
+      - fix a couple more completion edge cases
+
+0.20  2013-06-28
+      - completion for packages declared in the repl (Toby Inkster, gh-#7)
+      - completion for functions (Toby Inkster, gh-#8)
+
+0.19  2013-06-28
+      - fix test failures (reported by brunobuss)
+
 0.18  2013-06-27
       - tab completion support (with help from sartak)
       - lots of internal refactorings to make writing plugins easier

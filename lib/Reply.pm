@@ -116,20 +116,27 @@ sub run {
     print "\n";
 }
 
-=method step($line)
+=method step($line, $verbose)
 
 Runs a single iteration of the repl. If C<$line> is given, it will be used as
 the string to evaluate (and the C<prompt> and C<read_line> callbacks will not
-be called). Returns true if the repl can continue, and false if it was
-requested to quit.
+be called). If C<$verbose> is true, the prompt and line will be displayed as
+though they were typed. Returns true if the repl can continue, and false if it
+was requested to quit.
 
 =cut
 
 sub step {
     my $self = shift;
-    my ($line) = @_;
+    my ($line, $verbose) = @_;
 
-    $line = $self->_read unless defined $line;
+    if (defined $line) {
+        print $self->_wrapped_plugin('prompt'), $line, "\n"
+            if $verbose;
+    }
+    else {
+        $line = $self->_read;
+    }
 
     return unless defined $line;
 
@@ -324,9 +331,8 @@ sub _concatenate_plugin {
 
 No known bugs.
 
-Please report any bugs through RT: email
-C<bug-reply at rt.cpan.org>, or browse to
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Reply>.
+Please report any bugs to GitHub Issues at
+L<https://github.com/doy/reply/issues>.
 
 =head1 SEE ALSO
 
@@ -346,13 +352,13 @@ You can also look for information at:
 
 L<https://metacpan.org/release/Reply>
 
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Reply>
-
 =item * Github
 
 L<https://github.com/doy/reply>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Reply>
 
 =item * CPAN Ratings
 

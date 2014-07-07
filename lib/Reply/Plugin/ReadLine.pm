@@ -21,10 +21,11 @@ use Term::ReadLine;
 
 This plugin uses L<Term::ReadLine> to read lines from the user. This enables
 useful features such as line editing and command history. The history will be
-persisted between runs, by default in C<~/.reply_history>, although this is
-changeable with the C<history_file> option. To limit the number of lines
-written to this file, you can use the C<history_length> option. Setting a
-C<history_length> of C<0> will disable writing history to a file entirely.
+persisted between runs, by default in C<.reply_history> in your application
+data directory, although this is changeable with the C<history_file> option. To
+limit the number of lines written to this file, you can use the
+C<history_length> option. Setting a C<history_length> of C<0> will disable
+writing history to a file entirely.
 
 NOTE: you probably want to install a reasonable L<Term::ReadLine> backend in
 order for this plugin to be very useful. L<Term::ReadLine::Gnu> is highly
@@ -46,7 +47,16 @@ sub new {
         $history
     );
 
-    if ($self->{term}->ReadLine eq 'Term::ReadLine::Gnu') {
+    $self->{rl_gnu} = $self->{term}->ReadLine eq 'Term::ReadLine::Gnu';
+    $self->{rl_perl5} = $self->{term}->ReadLine eq 'Term::ReadLine::Perl5';
+    $self->{rl_caroline} = $self->{term}->ReadLine eq 'Term::ReadLine::Caroline';
+
+    if ($self->{rl_perl5}) {
+        # output compatible with Term::ReadLine::Gnu
+        $readline::rl_scroll_nextline = 0;
+    }
+
+    if ($self->{rl_perl5} || $self->{rl_gnu} || $self->{rl_caroline}) {
         $self->{term}->StifleHistory($opts{history_length})
             if defined $opts{history_length} && $opts{history_length} >= 0;
     }
@@ -81,7 +91,7 @@ sub DESTROY {
     return if defined $self->{history_length} && $self->{history_length} == 0;
 
     # XXX support more later
-    return unless $self->{term}->ReadLine eq 'Term::ReadLine::Gnu';
+    return unless ($self->{rl_gnu} || $self->{rl_perl5} || $self->{rl_caroline});
 
     $self->{term}->WriteHistory($self->{history_file})
         or warn "Couldn't write history to $self->{history_file}";
@@ -94,7 +104,7 @@ sub _register_tab_complete {
 
     weaken(my $weakself = $self);
 
-    if ($term->ReadLine eq 'Term::ReadLine::Gnu') {
+    if ($self->{rl_gnu}) {
         $term->Attribs->{attempted_completion_function} = sub {
             my ($text, $line, $start, $end) = @_;
 
@@ -109,6 +119,33 @@ sub _register_tab_complete {
                 return $matches[$index];
             });
         };
+    }
+
+    if ($self->{rl_perl5}) {
+        $term->Attribs->{completion_function} = sub {
+            my ($text, $line, $start) = @_;
+            my $end = $start + length($text);
+
+            # discard everything after the cursor for completion purposes
+            substr($line, $end) = '';
+
+            my @matches = $weakself->publish('tab_handler', $line);
+            return scalar(@matches) ? @matches : ();
+        };
+    }
+
+    if ($self->{rl_caroline}) {
+        $term->caroline->completion_callback(sub {
+            my ($line) = @_;
+
+            my @matches = $weakself->publish('tab_handler', $line);
+            # for variable completion, method name completion.
+            if (@matches && $line =~ /\W/) {
+                $line =~ s/[:\w]+\z//;
+                @matches = map { $line.$_ } @matches;
+            }
+            return scalar(@matches) ? @matches : ();
+        });
     }
 }
 

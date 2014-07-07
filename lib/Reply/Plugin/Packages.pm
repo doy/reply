@@ -27,8 +27,6 @@ sub new {
     my $self = $class->SUPER::new(@_);
     $self->{package} = $opts{default_package} || 'main';
 
-    $self->publish('package', $self->{package});
-
     return $self;
 }
 
@@ -56,9 +54,13 @@ sub compile {
     # eval_closure's environment parameter since we need to access the
     # information in a BEGIN block
     $self->{package} = our $package;
-    $self->publish('package', $self->{package});
 
     return @result;
+}
+
+sub package {
+    my $self = shift;
+    return $self->{package};
 }
 
 1;

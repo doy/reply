@@ -7,6 +7,8 @@ use base 'Reply::Plugin';
 
 use Module::Runtime '$module_name_rx';
 
+use Reply::Util 'all_packages';
+
 =head1 SYNOPSIS
 
   ; .replyrc
@@ -27,23 +29,11 @@ sub tab_handler {
     # $module_name_rx does not permit trailing ::
     my ($before, $package_fragment) = $line =~ /(.*?)(${module_name_rx}:?:?)$/;
     return unless $package_fragment;
+    return if $before =~ /^#/; # command
+    return if $before =~ /->\s*$/; # method call
     return if $before =~ /[\$\@\%\&\*]\s*$/;
 
-    my $file_fragment = $package_fragment;
-    $file_fragment =~ s{::}{/}g;
-
-    my $re = qr/^\Q$file_fragment/;
-
-    my @results;
-    for my $inc (keys %INC) {
-        if ($inc =~ $re) {
-            $inc =~ s{/}{::}g;
-            $inc =~ s{\.pm$}{};
-            push @results, $inc;
-        }
-    }
-
-    return @results;
+    return sort grep { index($_, $package_fragment) == 0 } all_packages();
 }
 
 1;
