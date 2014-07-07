@@ -8,7 +8,7 @@ use Reply::App;
 
 =head1 SYNOPSIS
 
-  reply [-lb] [-I dir] [-M mod] [--version] [--help] [--cfg file]
+  reply [-lb] [-I dir] [-M mod] [--cfg file] [-e code] [script.pl]
 
 =head1 DESCRIPTION
 
@@ -42,6 +42,10 @@ Equivalent to C<-I blib/lib -I blib/arch>.
 Loads the specified module before starting the repl. It is loaded within the
 repl, so things like exporting work properly.
 
+=item -e code
+
+Like C<< perl -e >>. Executes the code before starting the repl.
+
 =item --cfg ~/.replyrc
 
 Specifies a different configuration file to use. C<~/.replyrc> is the default.
@@ -55,6 +59,11 @@ Displays the program version.
 Displays usage information.
 
 =back
+
+=head1 ARGUMENTS
+
+Arguments which are not options (that is, do not start with hyphen) are
+treated as file names of Perl scripts to execute before starting the repl.
 
 =cut
 
