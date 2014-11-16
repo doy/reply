@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - unshift onto @INC instead of pusing directories set with -l/-b/-I
+        (ilmari, #40)
 
 0.35  2014-07-04
       - allow executing snippets and files from the argument list (suggested by
