@@ -75,17 +75,7 @@ sub run {
     my $file = $cfg->file;
     if (!-e $file) {
         print("$file not found. Generating a default...\n");
-        if (open my $fh, '>', $file) {
-            my $contents = do {
-                local $/;
-                <DATA>
-            };
-            $contents =~ s/use 5.XXX/use $]/;
-            print $fh $contents;
-            close $fh;
-        }
-        else {
-            warn "Couldn't write to $file";
+        unless ($self->generate_default_config($file)) {
             %args = ();
         }
     }
@@ -97,6 +87,34 @@ sub run {
     $reply->run;
 
     return 0;
+}
+
+=method generate_default_config($file)
+
+Generates default configuration file as per specified destination.
+
+=cut
+
+sub generate_default_config {
+    my $self = shift;
+    my ($file) = @_;
+
+    if (open my $fh, '>', $file) {
+        my $contents = do {
+            local $/;
+            <DATA>
+        };
+        $contents =~ s/use 5.XXX/use $]/;
+        print $fh $contents;
+        close $fh;
+
+        return 1;
+    }
+    else {
+        warn "Couldn't write to $file";
+
+        return 0;
+    }
 }
 
 =method usage($exitcode)
