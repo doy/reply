@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - internal refactoring for extensibility (sergeyromanov, #41)
 
 0.36  2014-11-16
       - unshift onto @INC instead of pusing directories set with -l/-b/-I
