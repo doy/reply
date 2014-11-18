@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.37  2014-11-18
       - internal refactoring for extensibility (sergeyromanov, #41)
 
 0.36  2014-11-16
