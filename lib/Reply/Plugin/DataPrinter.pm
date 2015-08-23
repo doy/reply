@@ -21,7 +21,8 @@ This plugin uses L<Data::Printer> to format results.
 sub mangle_result {
     my ($self, @result) = @_;
     return unless @result;
-    return p(@result, return_value => 'dump');
+    ( @result == 1 ) && return p($result[0]);
+    return p(@result);
 }
 
 1;
