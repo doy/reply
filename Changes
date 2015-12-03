@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.38  2015-12-02
       - fix running reply without the Package plugin (2shortplanks, #45)
 
 0.37  2014-11-18
