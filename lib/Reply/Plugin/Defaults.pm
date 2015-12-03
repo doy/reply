@@ -48,6 +48,7 @@ sub compile {
 
     my $env     = { map { %$_ } $self->publish('lexical_environment') };
     my $package = ($self->publish('package'))[-1];
+    $package = 'main' unless defined $package;
 
     my $prefix = "package $package;\n$PREFIX";
 

@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - fix running reply without the Package plugin (2shortplanks, #45)
 
 0.37  2014-11-18
       - internal refactoring for extensibility (sergeyromanov, #41)
