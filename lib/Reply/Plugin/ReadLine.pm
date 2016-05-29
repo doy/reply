@@ -14,7 +14,7 @@ use Term::ReadLine;
 
   ; .replyrc
   [ReadLine]
-  history_file = '.hist'
+  history_file = .hist
   history_length = 100
 
 =head1 DESCRIPTION
