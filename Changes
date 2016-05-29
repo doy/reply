@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - allow ~/ in the history_file option to ReadLine (y, #48)
 
 0.38  2015-12-02
       - fix running reply without the Package plugin (2shortplanks, #45)
