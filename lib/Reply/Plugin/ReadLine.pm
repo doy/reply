@@ -40,6 +40,7 @@ sub new {
     my $self = $class->SUPER::new(@_);
     $self->{term} = Term::ReadLine->new('Reply');
     my $history = $opts{history_file} || '.reply_history';
+    $history =~ s{^~/}{$ENV{HOME}/};
     $self->{history_file} = File::Spec->catfile(
         (File::Spec->file_name_is_absolute($history)
             ? ()
