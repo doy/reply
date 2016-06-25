@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - fix docs (y, #49)
 
 0.39  2016-05-29
       - allow ~/ in the history_file option to ReadLine (y, #48)
