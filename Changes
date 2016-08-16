@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.41  2016-08-16
       - add #vars command to list currently in scope variable names (garu, #39)
       - add Reply::Plugin::Pager to page long results (y, #47)
 
