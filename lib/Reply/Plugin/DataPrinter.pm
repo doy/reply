@@ -5,7 +5,7 @@ use warnings;
 
 use base 'Reply::Plugin';
 
-use Data::Printer alias => 'p', colored => 1;
+use Data::Printer alias => 'p', colored => 1, return_value => 'dump';
 
 =head1 SYNOPSIS
 
@@ -20,7 +20,9 @@ This plugin uses L<Data::Printer> to format results.
 
 sub mangle_result {
     my ($self, @result) = @_;
-    return p(@result, return_value => 'dump');
+    return unless @result;
+    ( @result == 1 ) && return p($result[0]);
+    return p(@result);
 }
 
 1;
