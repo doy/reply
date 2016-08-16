@@ -92,6 +92,13 @@ sub command_q {
     return '';
 }
 
+sub command_vars {
+    my $self = shift;
+
+    my %env = map { %$_ } $self->publish('lexical_environment');
+    return '(' . join(', ', map { qq<'$_'> } keys %env) . ')';
+}
+
 sub loop {
     my $self = shift;
     my ($continue) = @_;
@@ -105,6 +112,7 @@ sub loop {
 
   new
   command_q
+  command_vars
 
 =end Pod::Coverage
 
