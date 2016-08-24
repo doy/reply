@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - make tests pass again if Term::ReadKey is not installed (andk, #52)
 
 0.41  2016-08-16
       - add #vars command to list currently in scope variable names (garu, #39)
