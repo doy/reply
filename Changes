@@ -1,6 +1,8 @@
 Revision history for Reply
 
 {{$NEXT}}
+
+0.42  2016-08-23
       - make tests pass again if Term::ReadKey is not installed (andk, #52)
 
 0.41  2016-08-16
