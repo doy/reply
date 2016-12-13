@@ -57,6 +57,18 @@ sub new {
         $readline::rl_scroll_nextline = 0;
     }
 
+    if ($self->{rl_caroline}) {
+        eval { require Term::Encoding };
+        if ($@) {
+            warn "Term::Encoding is required to support multi byte characters";
+        }
+        else {
+            my $encoding = Term::Encoding::term_encoding();
+            binmode *STDIN, ":encoding(${encoding})";
+            binmode *STDOUT, ":encoding(${encoding})";
+        }
+    }
+
     if ($self->{rl_perl5} || $self->{rl_gnu} || $self->{rl_caroline}) {
         $self->{term}->StifleHistory($opts{history_length})
             if defined $opts{history_length} && $opts{history_length} >= 0;
