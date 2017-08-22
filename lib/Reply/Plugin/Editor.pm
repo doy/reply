@@ -26,6 +26,14 @@ the contents of that file will be preloaded instead.
 The C<editor> option can be specified to provide a different editor to use,
 otherwise it will use the value of C<$ENV{VISUAL}> or C<$ENV{EDITOR}>.
 
+The C<echo> option can be used to suppress or enable the display in reply
+itself of the text inserted through the editor.
+
+=head1 BUGS
+
+Despite the C<echo> option being enabled, output will not be available through
+the C<Nopaste> plugin.
+
 =cut
 
 sub new {
@@ -38,6 +46,7 @@ sub new {
             ? (editors => [ $opts{editor} ])
             : ())
     );
+    $self->{echo} = $opts{echo};
     $self->{current_text} = '';
 
     return $self;
@@ -73,6 +82,10 @@ sub command_e {
         $self->{current_text} = $text;
     }
 
+    if($self->{echo}) {
+      say $text;
+    }
+    
     return $text;
 }
 
