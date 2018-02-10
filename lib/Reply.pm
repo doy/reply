@@ -135,7 +135,7 @@ sub step {
             if $verbose;
     }
     else {
-        $line = $self->_read;
+        $line = $self->_wrapped_plugin('read', sub { $self->_read; });
     }
 
     return unless defined $line;
