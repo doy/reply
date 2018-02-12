@@ -2,6 +2,8 @@ Revision history for Reply
 
 {{$NEXT}}
 
+      - Add Reply::Plugin::Multiline::PPI for a multiline input support
+
 0.42  2016-08-23
       - make tests pass again if Term::ReadKey is not installed (andk, #52)
 

@@ -42,6 +42,13 @@ BEGIN {
 }
 PREFIX
 
+sub read {
+    my $self = shift;
+    my ($next, $read_coderef) = @_;
+
+    return $read_coderef->();
+}
+
 sub compile {
     my $self = shift;
     my ($next, $line, %args) = @_;
@@ -113,6 +120,7 @@ sub loop {
   new
   command_q
   command_vars
+  read
 
 =end Pod::Coverage
 
