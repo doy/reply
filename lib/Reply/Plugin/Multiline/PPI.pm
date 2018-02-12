@@ -39,6 +39,14 @@ MultiLine plugin,
 
 you may write the code across multiple lines, such as in C<irb> and C<python>.
 
+=begin Pod::Coverage
+
+# 	continue_reading_if_necessary
+# 	line_needs_continuation
+# 	read
+
+=end Pod::Coverage
+
 =cut
 
 sub new {

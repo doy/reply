@@ -120,6 +120,7 @@ sub loop {
   new
   command_q
   command_vars
+  read
 
 =end Pod::Coverage
 
