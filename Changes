@@ -1,6 +1,7 @@
 Revision history for Reply
 
 {{$NEXT}}
+      - Add a new Plugin ConfigPrompt for configurable prompt.
 
 0.42  2016-08-23
       - make tests pass again if Term::ReadKey is not installed (andk, #52)
