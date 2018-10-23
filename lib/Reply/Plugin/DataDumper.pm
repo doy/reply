@@ -11,18 +11,24 @@ use Data::Dumper;
 
   ; .replyrc
   [DataDumper]
+  respect_freeze = 0
 
 =head1 DESCRIPTION
 
 This plugin uses L<Data::Dumper> to format results.
 
+You can enable C<respect_freeze> feature to force L<Data::Dumper> call
+C<freeze> method to retrieve object suitable for dumping.
+
 =cut
 
 sub new {
     my $class = shift;
+    my %opts = @_;
 
     $Data::Dumper::Terse = 1;
     $Data::Dumper::Sortkeys = 1;
+    $Data::Dumper::Freezer = 'freeze' if $opts{respect_freeze};
 
     return $class->SUPER::new(@_);
 }
